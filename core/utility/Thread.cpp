@@ -27,12 +27,15 @@ Thread::Thread(const std::string&& name)
 }
 
 Thread::~Thread() noexcept{
-    if(worker_.joinable())
-        worker_.join();
+    stop();
 }
 
 void Thread::stop() noexcept{
+    if(isExit_){
+        return;
+    }
     isExit_ = true;
+    cond_.notify_all();
     if(worker_.joinable()){
         worker_.join();
     }

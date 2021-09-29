@@ -26,7 +26,7 @@ void test(){
 
 void testThread(){
     int testCount = 5;
-    Thread thread("test Thread");
+    Thread thread("----- test Thread -----");
     thread.setFunc(test);
     while(testCount){
         cout << "test Thread end" << testCount << ","<< Util::nowTimeStamp() << endl;
@@ -38,4 +38,5 @@ void testThread(){
         cout << "test Thread end" << testCount << "," << Util::nowTimeStamp() << endl;
     }
     thread.stop();
+    cout << "----- test thread end -----" << endl;
 }
