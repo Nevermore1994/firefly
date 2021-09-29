@@ -3,7 +3,6 @@ import shutil
  
 def delete_cmake_cache(file_path):
     for root_path, dirs, files in os.walk(file_path):
-        print ("path:" + os.path.join(root_path))
         for file in files:
             if file.find("CMakeCache") >= 0 or file.find("cmake_install") >= 0 or file.find(".a") >= 0:
                 print ("remove files:" + os.path.join(root_path, file))
