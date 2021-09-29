@@ -36,3 +36,10 @@
 *.xcodeworkspace
 xcuserdata
 *.pbxproj
+/CMakeCache.txt
+*.check_cache
+*.cmake
+*.log
+/CMakeFiles/3.20.4/CompilerIdCXX/CMakeCXXCompilerId.cpp
+/CMakeFiles/3.20.4/CompilerIdC/CMakeCCompilerId.c
+*.bin
