@@ -1,13 +1,20 @@
 //
-//  utility.hpp
-//  firelfly
+//  Utility.hpp
+//  firefly
 //
 //  Created by 谭平 on 2021/9/29.
 //
 
-#ifndef utility_hpp
-#define utility_hpp
+#pragma once
 
-#include <stdio.h>
+#include <cstdint>
 
-#endif /* utility_hpp */
+namespace firefly {
+
+namespace Util {
+
+uint64_t nowTimeStamp();
+
+}// end namespace Util
+
+}// end namespace firefly

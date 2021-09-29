@@ -6,8 +6,8 @@
 //
 #pragma once
 
-#include <stdio.h>
+#include "testThread.hpp"
 
 inline void runTest(){
-    
+    testThread();
 }

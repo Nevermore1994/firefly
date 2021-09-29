@@ -5,9 +5,7 @@
 //  Created by 谭平 on 2021/9/29.
 //
 
-#ifndef testThread_hpp
-#define testThread_hpp
+#pragma once
 
-#include <stdio.h>
+void testThread();
 
-#endif /* testThread_hpp */

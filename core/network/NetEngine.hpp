@@ -5,9 +5,26 @@
 //  Created by 谭平 on 2021/9/29.
 //
 
-#ifndef NetEngine_hpp
-#define NetEngine_hpp
+namespace firefly {
 
-#include <stdio.h>
+namespace network{
 
-#endif /* NetEngine_hpp */
+class NetEngine{
+
+public:
+    static NetEngine& shareInstance(){
+        static NetEngine instance;
+        return instance;
+    }
+    
+public:
+    NetEngine(const NetEngine&) = delete;
+    
+    
+private:
+    NetEngine();
+};
+
+}//end namespace network
+
+}//end namespace firefly
