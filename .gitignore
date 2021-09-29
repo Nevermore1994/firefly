@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+#xcode config
+*.xcodeproj
+*.xcodeworkspace
+xcuserdata
+*.pbxproj
