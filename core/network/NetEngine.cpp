@@ -6,3 +6,15 @@
 //
 
 #include "NetEngine.hpp"
+
+using namespace firefly;
+using namespace firefly::network;
+
+network::NetEngine::NetEngine(){
+    
+}
+
+network::NetEngine::~NetEngine(){
+    
+}
+

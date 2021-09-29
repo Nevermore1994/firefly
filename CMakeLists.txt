@@ -1,21 +1,34 @@
 cmake_minimum_required(VERSION 3.1)
 
+INCLUDE(CMakeForceCompiler)
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 project(firefly)
 
-include_directories("${PROJECT_SOURCE_DIR}/core/utility")
-include_directories("${PROJECT_SOURCE_DIR}/core/network")
-add_subdirectory(core)
+set(INCLUDE_DIR
+    ./test
+    ./core/network
+    ./core/utility
+)
 
-add_subdirectory(test)
+aux_source_directory(./test/ TEST_DIR_SRCS)
+aux_source_directory(./core/network CORE_NETWORK_DIR_SRCS)
+aux_source_directory(./core/utility CORE_UTILITY_DIR_SRCS)
 
-aux_source_directory(. DIR_SRCS)
+file(GLOB ALL_SOURCE
+    ${TEST_DIR_SRCS}
+    ${CORE_NETWORK_DIR_SRCS}
+    ${CORE_UTILITY_DIR_SRCS}
+)
 
-add_executable(${PROJECT_NAME} main.cpp)
+include_directories(${INCLUDE_DIR})
 
 find_package(Threads REQUIRED)
 
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT} network util test)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+
+add_executable(${PROJECT_NAME} main.cpp ${ALL_SOURCE})
+

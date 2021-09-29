@@ -43,3 +43,11 @@ xcuserdata
 /CMakeFiles/3.20.4/CompilerIdCXX/CMakeCXXCompilerId.cpp
 /CMakeFiles/3.20.4/CompilerIdC/CMakeCCompilerId.c
 *.bin
+*.make
+*.ts
+/CMakeFiles/Makefile2
+/CMakeFiles/firefly.dir/link.txt
+/Makefile
+/bin/firefly
+/CMakeFiles/TargetDirectories.txt
+/CMakeFiles/progress.marks

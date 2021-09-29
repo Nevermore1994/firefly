@@ -12,7 +12,7 @@ namespace network{
 class NetEngine{
 
 public:
-    static NetEngine& shareInstance(){
+    inline static NetEngine& shareInstance(){
         static NetEngine instance;
         return instance;
     }
@@ -20,7 +20,13 @@ public:
 public:
     NetEngine(const NetEngine&) = delete;
     
+    NetEngine& operator=(const NetEngine&) = delete;
     
+    NetEngine(const NetEngine&&) = delete;
+    
+    NetEngine& operator=(const NetEngine&&) = delete;
+    
+    ~NetEngine();
 private:
     NetEngine();
 };
