@@ -12,11 +12,11 @@ matrix:
           packages:
            - gcc-9
       env:
-         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+         - MATRIX_EVAL="CC=gcc-10 && CXX=g++-10"
 
 before_install:
 - eval "${MATRIX_EVAL}"
-- sudo apt-get install gcc-9 g++-9
+- sudo apt-get install gcc-10 g++-10
 
 #macOS
 matrix:
@@ -24,7 +24,7 @@ matrix:
     - os: osx
       osx_image: xcode12.5
       env:
-        - MATRIX_EVAL="CC=clang-12.0.5 && CXX=clang++-12.0.5"
+        - MATRIX_EVAL="brew install gcc && CC=gcc-10 && CXX=g++-10"
 
 before_install:
 - eval "${MATRIX_EVAL}"
