@@ -20,7 +20,7 @@ matrix:
 before_install:
 - eval "${MATRIX_EVAL}"
 - sudo apt-get install gcc-10 g++-10
-- sudo apt-get install clang-1205.0.22.11 clang++-1205.0.22.11
+- sudo apt-get install clang-12 clang++-12
 
 compiler:
 - gcc
