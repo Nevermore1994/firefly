@@ -11,6 +11,7 @@
 #include <thread>
 #include <string>
 #include <functional>
+#include <atomic>
 
 namespace firefly {
 
