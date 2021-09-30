@@ -1,6 +1,16 @@
 language: cpp
 sudo: required
 
+compiler:
+- gcc
+- clang
+install: make get-deps
+
+before_install:
+- eval "${MATRIX_EVAL}"
+- sudo apt-get install gcc-10 g++-10
+- sudo apt-get install clang-12 clang++-12
+
 matrix:
   include:
     - os: linux
@@ -9,22 +19,23 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-           - gcc-9
+           - g++-10
       env:
          - MATRIX_EVAL="CC=gcc-10 && CXX=g++-10"
-
-    include:
+  include:
+      - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-12.0
+          packages:
+           - clang++-12
+      env:
+         - MATRIX_EVAL="CC=clang-12 && CXX=clang++-12"
+  include:
     - os: osx
       osx_image: xcode12.5
-
-before_install:
-- eval "${MATRIX_EVAL}"
-- sudo apt-get install gcc-10 g++-10
-- sudo apt-get install clang-12 clang++-12
-
-compiler:
-- gcc
-- clang
 
 branches:
   - main
