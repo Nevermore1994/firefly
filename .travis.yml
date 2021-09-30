@@ -1,0 +1,43 @@
+language: cpp
+sudo: required
+
+#linux
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+           - gcc-9
+      env:
+         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+
+before_install:
+- eval "${MATRIX_EVAL}"
+- sudo apt-get install gcc-9 g++-9
+
+#macOS
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode12.5
+      env:
+        - MATRIX_EVAL="CC=clang-12.0.5 && CXX=clang++-12.0.5"
+
+before_install:
+- eval "${MATRIX_EVAL}"
+
+compiler:
+- gcc
+- clang
+
+branches:
+  - main
+  - develop
+
+script:
+- cd $TRAVIS_BUILD_DIR
+- cmake -G "Unix Makefiles" .
+- make -j 4
