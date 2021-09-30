@@ -26,11 +26,10 @@ file(GLOB ALL_SOURCE
 
 include_directories(${INCLUDE_DIR})
 
-find_package(Threads REQUIRED)
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
-
-target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(${PROJECT_NAME} main.cpp ${ALL_SOURCE})
 
+find_package(Threads REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
