@@ -30,5 +30,7 @@ find_package(Threads REQUIRED)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
-add_executable(${PROJECT_NAME} main.cpp ${ALL_SOURCE} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
+
+add_executable(${PROJECT_NAME} main.cpp ${ALL_SOURCE})
 
