@@ -17,14 +17,13 @@ matrix:
 before_install:
 - eval "${MATRIX_EVAL}"
 - sudo apt-get install gcc-10 g++-10
+- sudo apt-get install clang-1205.0.22.11 clang++-1205.0.22.11
 
 #macOS
 matrix:
   include:
     - os: osx
       osx_image: xcode12.5
-      env:
-        - MATRIX_EVAL="brew install gcc && CC=gcc-10 && CXX=g++-10"
 
 before_install:
 - eval "${MATRIX_EVAL}"
