@@ -68,8 +68,8 @@ private:
     void process() noexcept;
 private:
     std::function<void()> func_;
-    std::atomic_bool isRuning_;
-    std::atomic_bool isExit_;
+    std::atomic<bool>  isRuning_;
+    std::atomic<bool>  isExit_;
     std::string name_;
     std::thread worker_;
     std::mutex mutex_;
