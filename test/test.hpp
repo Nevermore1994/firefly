@@ -7,7 +7,10 @@
 #pragma once
 
 #include "testThread.hpp"
+#include "testPacketPool.h"
 
 inline void runTest(){
+    testPackPool();
+
     testThread();
 }

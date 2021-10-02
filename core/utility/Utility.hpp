@@ -8,12 +8,15 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 namespace firefly {
 
 namespace Util {
 
 uint64_t nowTimeStamp();
+
+std::string randomString(uint32_t length);
 
 }// end namespace Util
 

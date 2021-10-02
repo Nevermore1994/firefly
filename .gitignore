@@ -46,3 +46,9 @@ xcuserdata
 *.ts
 /Makefile
 /bin
+/.idea/dictionaries/ping_tan.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/firefly.iml
+/firefly.cbp
