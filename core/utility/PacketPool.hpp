@@ -62,11 +62,11 @@ public:
         
         if(typeValue == kPacketTypeExtraValue){
             packet = std::make_shared<Packet>(len + 1);
-            pool_[kPacketTypeExtraValue].push_back(packet);
         } else {
             packet = pool_[typeValue].front();
             pool_[typeValue].pop_front();
         }
+        memset(packet->buffer.get(), 0, packet->size);
         memcpy(packet->buffer.get(), data, len);
         packet->length = len;
         return packet;
