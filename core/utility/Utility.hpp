@@ -14,9 +14,15 @@ namespace firefly {
 
 namespace Util {
 
-uint64_t nowTimeStamp();
+uint64_t nowTimestamp();
 
 std::string randomString(uint32_t length);
+
+uint64_t randomId(uint32_t length);
+
+uint32_t shortId();
+
+std::string uuid();
 
 }// end namespace Util
 

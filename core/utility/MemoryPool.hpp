@@ -37,9 +37,6 @@ public:
     
     void release(){
         for(auto& pair:pool){
-            std::for_each(pair.second.begin(), pair.second.end(), [](std::shared_ptr<T> ptr){
-                ptr.reset();
-            });
             pair.second.clear();
         }
         pool.clear();

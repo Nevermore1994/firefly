@@ -87,14 +87,6 @@ struct Packet{
         this->length = 0;
         this->timeStamp = 0;
     }
-
-    ~Packet(){
-        static uint32_t count = 0;
-        reset();
-        this->buffer.reset();
-        count++;
-        std::cout << "release :" << count << std::endl;
-    }
 };
 
 }

@@ -12,6 +12,7 @@
 #include <string>
 #include <functional>
 #include <atomic>
+#include "Utility.hpp"
 
 namespace firefly {
 
@@ -21,7 +22,7 @@ public:
     template<class Func, typename ... Args>
     Thread(const std::string&& name, Func&& f, Args&& ... args)
         :name_(name)
-        ,isRuning_(false)
+        ,isRunning_(false)
         ,isExit_(false)
         ,worker_(&Thread::process, this)
     {
@@ -32,7 +33,7 @@ public:
     template<class Func, typename ... Args>
     Thread(const std::string& name, Func&& f, Args&& ... args)
         :name_(name)
-        ,isRuning_(false)
+        ,isRunning_(false)
         ,isExit_(false)
         ,worker_(&Thread::process, this)
     {
@@ -40,9 +41,9 @@ public:
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
     }
     
-    Thread(const std::string&& name);
+    explicit Thread(const std::string&& name);
     
-    Thread(const std::string& name);
+    explicit Thread(const std::string& name);
     
     ~Thread() noexcept;
     
@@ -62,14 +63,15 @@ public:
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
     }
 public:
-    inline bool isRuning() const noexcept {
-        return isRuning_.load();
+    inline bool isRunning() const noexcept {
+        return isRunning_.load();
     }
 private:
     void process() noexcept;
+    void setThreadName() noexcept;
 private:
     std::function<void()> func_;
-    std::atomic<bool>  isRuning_;
+    std::atomic<bool>  isRunning_;
     std::atomic<bool>  isExit_;
     std::string name_;
     std::thread worker_;

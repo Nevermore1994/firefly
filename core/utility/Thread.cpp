@@ -4,7 +4,7 @@
 //
 //  Created by 谭平 on 2021/9/29.
 //
-#include <iostream>
+#include <pthread.h>
 #include "Thread.hpp"
 #include "Utility.hpp"
 
@@ -14,7 +14,7 @@ Thread::Thread(const std::string& name)
     :name_(name)
     ,worker_(&Thread::process, this)
     ,isExit_(false)
-    ,isRuning_(false){
+    ,isRunning_(false){
     func_ = nullptr;
 }
 
@@ -22,7 +22,7 @@ Thread::Thread(const std::string&& name)
     :name_(name)
     ,worker_(&Thread::process, this)
     ,isExit_(false)
-    ,isRuning_(false){
+    ,isRunning_(false){
     func_ = nullptr;
 }
 
@@ -42,10 +42,10 @@ void Thread::stop() noexcept{
 }
 
 void Thread::pause() noexcept{
-    if(!isRuning_ || isExit_){
+    if(!isRunning_ || isExit_){
         return;
     }
-    isRuning_ = false;
+    isRunning_ = false;
 }
 
 void Thread::resume() noexcept{
@@ -53,23 +53,32 @@ void Thread::resume() noexcept{
 }
 
 void Thread::start() noexcept{
-    if(isRuning_ || isExit_){
+    if(isRunning_ || isExit_){
         return;
     }
-    isRuning_ = true;
+    isRunning_ = true;
     cond_.notify_all();
 }
 
 void Thread::process() noexcept{
+    setThreadName();
     while(!isExit_){
-        if(isRuning_ && func_){
+        if(isRunning_ && func_){
             func_();
         } else {
             std::unique_lock<std::mutex> lock(mutex_);
             cond_.wait(lock, [&]{
-                return isExit_ || isRuning_;
+                return isExit_ || isRunning_;
             });
         }
     }
 }
 
+void Thread::setThreadName() noexcept{
+#ifndef __APPLE__
+    auto handle = worker_.native_handle();
+    pthread_setname_np(handle,name_.c_str());
+#else
+    pthread_setname_np(name_.c_str());
+#endif
+}

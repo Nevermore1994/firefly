@@ -75,10 +75,10 @@ public:
     void releasePacket(std::shared_ptr<Packet> packet) noexcept{
         std::unique_lock<std::mutex> lock(mutex_);
         if(packet->type == PacketType::PacketTypeExtra){
-            packet.reset();
+            packet.reset(); //pointer reset, release pointer
         } else {
             auto type = static_cast<uint32_t>(packet->type);
-            packet->reset();
+            packet->reset(); //packet reset
             pool_[type].push_back(packet);
         }
     }
