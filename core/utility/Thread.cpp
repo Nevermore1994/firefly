@@ -18,8 +18,8 @@ Thread::Thread(const std::string& name)
     func_ = nullptr;
 }
 
-Thread::Thread(const std::string&& name)
-    :name_(name)
+Thread::Thread(std::string&& name)
+    :name_(std::move(name))
     ,worker_(&Thread::process, this)
     ,isExit_(false)
     ,isRunning_(false){

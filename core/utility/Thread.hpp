@@ -20,8 +20,8 @@ class Thread{
 
 public:
     template<class Func, typename ... Args>
-    Thread(const std::string&& name, Func&& f, Args&& ... args)
-        :name_(name)
+    Thread(std::string&& name, Func&& f, Args&& ... args)
+        :name_(std::move(name))
         ,isRunning_(false)
         ,isExit_(false)
         ,worker_(&Thread::process, this)
@@ -41,7 +41,7 @@ public:
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
     }
     
-    explicit Thread(const std::string&& name);
+    explicit Thread(std::string&& name);
     
     explicit Thread(const std::string& name);
     

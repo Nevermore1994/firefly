@@ -27,16 +27,18 @@ public:
     TimerManager(const TimerManager&&) = delete;
     TimerManager& operator=(const TimerManager&&) = delete;
     
-    TimerId runAt(uint64_t timeStamp, TimerCallback func);
-    TimerId runAfter(uint64_t delayTime, TimerCallback func);
-    TimerId runLoop(uint64_t timeInterval, TimerManager func);
+    TimerId runAt(uint64_t timestamp, TimerCallback func);
+    TimerId runAfter(uint64_t delayTime, TimerCallback func); //ms
+    TimerId runLoop(uint64_t timeInterval, TimerCallback func);
 
 private:
     void loop();
+    TimerId addTimer(uint64_t timestamp, TimerCallback func, bool isLoop, uint64_t timeInterval = 0);
 private:
     std::unique_ptr<Thread> timerThread_;
     std::priority_queue<TimerInfo, std::vector<TimerInfo>, std::less<TimerInfo>> timerInfos_;
     std::unordered_map<TimerId, Timer> timers_;
+    std::mutex mutex_;
 };
 
 }
