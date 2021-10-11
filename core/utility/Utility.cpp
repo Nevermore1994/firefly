@@ -35,7 +35,10 @@ std::string Util::randomString(uint32_t length) {
     return result;
 }
 
-uint64_t  Util::randomId(uint32_t length) {
+uint64_t Util::randomId(uint32_t length) {
+    if(length >= 18){
+        throw std::runtime_error("randomId error");
+    }
     static std::string charset = "1234567890";
     std::string result;
     result.resize(length);
@@ -49,7 +52,7 @@ uint64_t  Util::randomId(uint32_t length) {
 }
 
 uint32_t Util::shortId() {
-    return Util::randomId(32);
+    return Util::randomId(12);
 }
 
 std::string Util::uuid() {

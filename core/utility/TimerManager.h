@@ -30,13 +30,14 @@ public:
     TimerId runAt(uint64_t timestamp, TimerCallback func);
     TimerId runAfter(uint64_t delayTime, TimerCallback func); //ms
     TimerId runLoop(uint64_t timeInterval, TimerCallback func);
-
+    
+    void cancel(TimerId id);
 private:
     void loop();
     TimerId addTimer(uint64_t timestamp, TimerCallback func, bool isLoop, uint64_t timeInterval = 0);
 private:
     std::unique_ptr<Thread> timerThread_;
-    std::priority_queue<TimerInfo, std::vector<TimerInfo>, std::less<TimerInfo>> timerInfos_;
+    std::priority_queue<TimerInfo, std::vector<TimerInfo>, std::greater<TimerInfo>> timerInfos_;
     std::unordered_map<TimerId, Timer> timers_;
     std::mutex mutex_;
 };

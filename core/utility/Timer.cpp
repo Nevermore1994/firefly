@@ -17,6 +17,10 @@ bool TimerInfo::operator<(const TimerInfo &rhs) const noexcept {
     return expireTime < rhs.expireTime;
 }
 
+bool TimerInfo::operator>(const TimerInfo &rhs) const noexcept {
+    return expireTime > rhs.expireTime;
+}
+
 Timer::Timer()
     : timerInfo(0)
     , func(nullptr)

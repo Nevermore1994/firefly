@@ -21,6 +21,7 @@ struct TimerInfo{
     uint64_t loopInterval = 0; //ms
     
     bool operator<(const TimerInfo& rhs) const noexcept;
+    bool operator>(const TimerInfo& rhs) const noexcept;
     
     TimerInfo(uint64_t time);
     TimerInfo(const TimerInfo& info) = default;
@@ -28,6 +29,7 @@ struct TimerInfo{
     TimerInfo(TimerInfo&& info) = default;
     TimerInfo& operator=(TimerInfo&& info) = default;
 };
+
 
 struct Timer{
     Timer();
