@@ -22,9 +22,9 @@ public:
     
     NetEngine& operator=(const NetEngine&) = delete;
     
-    NetEngine(const NetEngine&&) = delete;
+    NetEngine(NetEngine&&) = delete;
     
-    NetEngine& operator=(const NetEngine&&) = delete;
+    NetEngine& operator=(NetEngine&&) = delete;
     
     ~NetEngine();
 private:

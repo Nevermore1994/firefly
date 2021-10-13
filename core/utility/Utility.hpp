@@ -10,9 +10,8 @@
 #include <cstdint>
 #include <string>
 
-namespace firefly {
 
-namespace Util {
+namespace firefly::Util {
 
 uint64_t nowTimestamp();
 
@@ -24,6 +23,5 @@ uint32_t shortId();
 
 std::string uuid();
 
-}// end namespace Util
+}// end namespace firefly::Util
 
-}// end namespace firefly
