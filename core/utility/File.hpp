@@ -40,13 +40,13 @@ protected:
 
 class WriteFile:virtual public IFile
 {
-    constexpr static uint32_t kCheckCount = 2048;
+    constexpr static uint32_t kCheckCount = 512;
 public:
     explicit WriteFile(const std::string& path);
     explicit WriteFile(std::string&& path);
     virtual ~WriteFile();
     void write(const std::string& str);
-    void write(const char* str, uint32_t size);
+    void write(const uint8_t* data, uint32_t size);
     void flush();
 
 public:

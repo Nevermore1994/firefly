@@ -60,6 +60,8 @@ void FileUtil::WriteFile::close(){
         fflush(file_);
         fclose(file_);
         file_ = nullptr;
+        writeSize_ = 0;
+        writeCount_ = 0;
     }
 }
 
@@ -74,12 +76,12 @@ void FileUtil::WriteFile::write(const std::string& str){
     write(str.c_str(), str.length());
 }
 
-void FileUtil::WriteFile::write(const char* str, uint32_t size){
+void FileUtil::WriteFile::write(const uint8_t* data, uint32_t size){
     if(!file_){
         return;
     }
     writeCount_ ++;
-    size = fwrite(str, 1 , size, file_);
+    size = fwrite(data, size , 1, file_);
     writeSize_ += size;
     if(writeCount_ >= checkEveryN_){
         flush();
