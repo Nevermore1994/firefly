@@ -74,6 +74,7 @@ void Thread::process() noexcept{
     }
 }
 
+
 void Thread::setThreadName() noexcept{
 #ifndef __APPLE__
     auto handle = worker_.native_handle();

@@ -78,7 +78,7 @@ public:
             packet.reset(); //pointer reset, release pointer
         } else {
             auto type = static_cast<uint32_t>(packet->type);
-            packet->reset(); //packet reset
+            packet->release(); //packet reset
             pool_[type].push_back(packet);
         }
     }

@@ -81,7 +81,7 @@ struct Packet{
         packet.buffer.reset(nullptr);
     }
 
-    inline void reset(){
+    inline void release(){
         memset(this->buffer.get(), 0, size);
         this->pos = 0;
         this->length = 0;

@@ -47,8 +47,6 @@ public:
     
     ~Thread() noexcept;
     
-    void setFunc() noexcept;
-    
     void start() noexcept;
     
     void pause() noexcept;
@@ -58,7 +56,7 @@ public:
     void stop() noexcept;
     
     template<class Func, typename ... Args>
-    void setFunc(Func&& f, Args&& ... args){
+    void setFunc(Func&& f, Args&& ... args) noexcept{
         std::unique_lock<std::mutex> lock(mutex_);
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
     }
