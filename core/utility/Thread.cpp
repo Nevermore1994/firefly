@@ -1,9 +1,9 @@
 //
-//  Thread.cpp
-//  firefly
+// Created by Nevermore on 2021/10/22.
+// firefly Thread
+// Copyright (c) 2021 Nevermore All rights reserved.
 //
-//  Created by 谭平 on 2021/9/29.
-//
+
 #include <pthread.h>
 #include "Thread.hpp"
 #include "Utility.hpp"

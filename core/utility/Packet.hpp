@@ -1,8 +1,7 @@
 //
-//  Packet.hpp
-//  firefly
-//
-//  Created by 谭平 on 2021/9/30.
+// Created by Nevermore on 2021/10/22.
+// firefly MemoryPool
+// Copyright (c) 2021 Nevermore All rights reserved.
 //
 
 #pragma once

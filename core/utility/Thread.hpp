@@ -1,10 +1,8 @@
 //
-//  Thread.hpp
-//  firefly
+// Created by Nevermore on 2021/10/22.
+// firefly Thread
+// Copyright (c) 2021 Nevermore All rights reserved.
 //
-//  Created by 谭平 on 2021/9/29.
-//
-
 #pragma once
 #include <mutex>
 #include <condition_variable>

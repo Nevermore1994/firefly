@@ -1,14 +1,15 @@
 //
-//  Utility.cpp
-//  firefly
-//
-//  Created by 谭平 on 2021/9/29.
+// Created by Nevermore on 2021/10/22.
+// firefly Utility
+// Copyright (c) 2021 Nevermore All rights reserved.
 //
 
 #include "Utility.hpp"
 #include <chrono>
 #include <random>
 #include <thread>
+#include <string>
+#include <sstream>
 
 #ifdef __GLIBC__
 #include <pthread.h>
@@ -16,6 +17,7 @@
 
 using namespace firefly;
 using namespace firefly::Util;
+using namespace std::literals;
 
 uint64_t Util::nowTimestamp(){
     auto tp = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now());
@@ -23,7 +25,7 @@ uint64_t Util::nowTimestamp(){
 }
 
 std::string Util::randomString(uint32_t length) {
-    static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+    static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"s;
     std::string result;
     result.resize(length);
 
@@ -39,7 +41,7 @@ uint64_t Util::randomId(uint32_t length) {
     if(length >= 18){
         throw std::runtime_error("randomId error");
     }
-    static std::string charset = "1234567890";
+    static std::string charset = "1234567890"s;
     std::string result;
     result.resize(length);
     
@@ -57,5 +59,17 @@ uint32_t Util::shortId() {
 
 std::string Util::uuid() {
     return Util::randomString(64);
+}
+
+std::vector<std::string>& Util::spiltString(const std::string& str, char flag, std::vector<std::string>& res, bool isSkipSpace) {
+    std::istringstream iss(str);
+    for (std::string item; std::getline(iss, item, flag);)
+    {
+        if (isSkipSpace && item.empty())
+            continue;
+        else
+            res.push_back(item);
+    }
+    return res;
 }
 

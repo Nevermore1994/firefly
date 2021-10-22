@@ -52,3 +52,4 @@ xcuserdata
 /.idea/vcs.xml
 /.idea/firefly.iml
 /firefly.cbp
+*.xml

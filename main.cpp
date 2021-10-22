@@ -6,8 +6,10 @@
 //
 
 #include "test.hpp"
+#include <netdb.h>
 
 int main(int argc, const char * argv[]) {
     runTest();
+    
     return 0;
 }
