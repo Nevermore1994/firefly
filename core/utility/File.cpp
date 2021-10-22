@@ -44,11 +44,15 @@ FileUtil::WriteFile::WriteFile(std::string&& path)
 }
 
 FileUtil::WriteFile::~WriteFile(){
+    flush();
 }
 
 bool FileUtil::WriteFile::open(){
     if(path_.empty())
         return false;
+    if(file_){
+        return true;
+    }
     file_ = fopen(path_.c_str(), ModeStr[(int)mode_]);
     writeSize_ = 0;
     writeCount_ = 0;
@@ -73,7 +77,11 @@ void FileUtil::WriteFile::flush(){
 }
 
 void FileUtil::WriteFile::write(const std::string& str){
-    write(str.c_str(), str.length());
+    write(reinterpret_cast<const uint8_t *>(str.c_str()), str.length());
+}
+
+void FileUtil::WriteFile::write(std::string&& str) {
+    write(reinterpret_cast<const uint8_t *>(str.c_str()), str.length());
 }
 
 void FileUtil::WriteFile::write(const uint8_t* data, uint32_t size){
@@ -131,11 +139,11 @@ std::string FileUtil::ReadFile::readUntilChar(char ch){
         std::string res;
         int c = getc(file_);
         while(ch != c && c != EOF){
-            res.append(1, ch);
+            res.append(1, c);
             readSize_ ++;
-            ch = getc(file_);
+            c = getc(file_);
         }
-        if(ch == EOF){
+        if(c == EOF){
             readOver_ = true;
         }
         return res;
@@ -154,6 +162,9 @@ std::string FileUtil::ReadFile::readWord(){
 bool FileUtil::ReadFile::open(){
     if(path_.empty())
         return false;
+    if(file_){
+        return true;
+    }
     file_ = fopen(path_.c_str(), ModeStr[(int)mode_]);
     readSize_ = 0;
     readOver_ = false;
@@ -161,7 +172,10 @@ bool FileUtil::ReadFile::open(){
 }
 
 void FileUtil::ReadFile::close(){
-
+    if(file_){
+        fclose(file_);
+        file_ = nullptr;
+    }
 }
 
 FileUtil::File::File(const std::string& path)
@@ -180,13 +194,16 @@ FileUtil::File::File(std::string&& path)
 }
 
 FileUtil::File::~File(){
-
+    flush();
 }
 
 bool FileUtil::File::open()
 {
     if(path_.empty())
         return false;
+    if(file_){
+        return true;
+    }
     file_ = fopen(path_.c_str(), ModeStr[(int)mode_]);
     return file_ != nullptr;
 }

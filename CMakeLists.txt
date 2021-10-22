@@ -32,4 +32,6 @@ add_executable(${PROJECT_NAME} main.cpp ${ALL_SOURCE})
 
 find_package(Threads REQUIRED)
 
+set(CMAKE_BUILD_TYPE Debug)
+
 target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})

@@ -9,10 +9,12 @@
 #include "testThread.hpp"
 #include "testPacketPool.h"
 #include "testTimer.hpp"
+#include "testFile.hpp"
 
 inline void runTest(){
     //testPackPool();
 
     //testThread();
-    testTimer();
+    //testTimer();
+    testFile();
 }

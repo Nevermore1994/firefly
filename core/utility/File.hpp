@@ -34,7 +34,7 @@ public:
 
 protected:
     std::string path_;
-    FileHandle file_;
+    FileHandle file_ = nullptr;
     FileMode mode_;
 };
 
@@ -46,6 +46,7 @@ public:
     explicit WriteFile(std::string&& path);
     virtual ~WriteFile();
     void write(const std::string& str);
+    void write(std::string&& str);
     void write(const uint8_t* data, uint32_t size);
     void flush();
 
@@ -94,7 +95,5 @@ public:
     bool open() final;
     void close() final;
 };
-
-
 
 }//end namespace firefly::FileUtil

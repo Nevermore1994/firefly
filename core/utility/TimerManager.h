@@ -24,8 +24,8 @@ public:
     ~TimerManager();
     TimerManager(const TimerManager&) = delete;
     TimerManager& operator=(const TimerManager&) = delete;
-    TimerManager(const TimerManager&&) = delete;
-    TimerManager& operator=(const TimerManager&&) = delete;
+    TimerManager(TimerManager&&) = delete;
+    TimerManager& operator=(TimerManager&&) = delete;
     
     TimerId runAt(uint64_t timestamp, TimerCallback func);
     TimerId runAfter(uint64_t delayTime, TimerCallback func); //ms
