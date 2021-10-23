@@ -16,6 +16,8 @@ enum class IPType{
     IPv6,
 };
 
+using SocketAddress = struct sockaddr_in;
+using SocketAddressv6 = struct sockaddr_in6;
 using IPv4 = struct in_addr;
 using IPv6 = struct in6_addr;
 using IPAddr = std::variant<IPv4, IPv6>;
@@ -26,14 +28,6 @@ struct IPAddressInfo{
     IPType type;
 };
 
-struct IPAddress {
-public:
-    explicit IPAddress(Port p);
-    bool isValid() const noexcept;
-public:
-    IPAddressInfo ip;
-    Port  port;
-};
 
 }
 
