@@ -9,20 +9,23 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 project(firefly)
 
 set(INCLUDE_DIR
-    ./test
-    ./core/network
-    ./core/utility
-)
+        ./test
+        ./core/network
+        ./core/utility
+        ./third_party
+        )
 
 aux_source_directory(./test/ TEST_DIR_SRCS)
 aux_source_directory(./core/network CORE_NETWORK_DIR_SRCS)
 aux_source_directory(./core/utility CORE_UTILITY_DIR_SRCS)
+aux_source_directory(./third_party THIRD_PARTY_DIR_SRCS)
 
 file(GLOB ALL_SOURCE
-    ${TEST_DIR_SRCS}
-    ${CORE_NETWORK_DIR_SRCS}
-    ${CORE_UTILITY_DIR_SRCS}
-)
+        ${TEST_DIR_SRCS}
+        ${CORE_NETWORK_DIR_SRCS}
+        ${CORE_UTILITY_DIR_SRCS}
+        ${THIRD_PARTY_DIR_SRCS}
+        )
 
 include_directories(${INCLUDE_DIR})
 
