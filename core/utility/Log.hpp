@@ -17,15 +17,15 @@ enum class LogType{
     Assert
 };
 
-constexpr const char* kLogStrs[] = {"debug", "info", "warning", "error", "assert"};
+constexpr const char* kLogStrs[] = {" [debug] ", " [info] ", " [warning] ", " [error] ", " [assert] "};
 
 constexpr const uint16_t kMaxLogBuffSize = 1024;
 
-void printLog(int level, const char *format, ...);
+void printLog(LogType level, const char *format, ...);
 
 #define logger(level, format, args...) \
     do {                               \
-        std::string formatStr("[%s][Line:%s][Function:%s]"); \
+        std::string formatStr("[%s][Line:%d][Function:%s] "); \
         formatStr.append(format);                               \
         printLog(level, formatStr.c_str(), __FILE__, __LINE__, __FUNCTION__, ##args);  \
     } while(0)

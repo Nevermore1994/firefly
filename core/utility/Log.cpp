@@ -9,7 +9,7 @@
 //todo:platform log
 using namespace firefly;
 
-void printLog(LogType level, const char *format, ...){
+void firefly::printLog(LogType level, const char *format, ...){
     std::string logStr = date::format("%F %T", std::chrono::system_clock::now());
     logStr.append(kLogStrs[static_cast<int>(level)]);
     
@@ -24,3 +24,4 @@ void printLog(LogType level, const char *format, ...){
     fprintf(stdout,"%s\n", logStr.c_str());
     fflush(stdout);
 }
+
