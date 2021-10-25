@@ -11,7 +11,7 @@
 
 using namespace firefly;
 int main(int argc, const char * argv[]) {
-    //runTest();
+    runTest();
     logd("test log");
     return 0;
 }

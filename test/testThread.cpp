@@ -15,13 +15,13 @@ using namespace std;
 using namespace firefly;
 
 void test(){
-    uint64_t start = Util::nowTimestamp();
+    uint64_t start = Util::nowTimeStamp();
     cout << "test start" << endl;
     uint64_t sum = 0;
     for(int i = 0; i < 1000000; i++){
         sum += i;
     }
-    cout << "test end, cost time:" << Util::nowTimestamp() - start << endl;
+    cout << "test end, cost time:" << Util::nowTimeStamp() - start << endl;
 }
 
 void testThread(){
@@ -29,13 +29,13 @@ void testThread(){
     Thread thread("----- test Thread -----");
     thread.setFunc(test);
     while(testCount){
-        cout << "test Thread end" << testCount << ","<< Util::nowTimestamp() << endl;
+        cout << "test Thread end" << testCount << ","<< Util::nowTimeStamp() << endl;
         thread.resume();
         usleep(1000 * 10);
         thread.pause();
         sleep(2);
         testCount--;
-        cout << "test Thread end" << testCount << "," << Util::nowTimestamp() << endl;
+        cout << "test Thread end" << testCount << "," << Util::nowTimeStamp() << endl;
     }
     thread.stop();
     cout << "----- test thread end -----" << endl;

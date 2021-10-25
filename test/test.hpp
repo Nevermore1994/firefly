@@ -15,6 +15,6 @@ inline void runTest(){
     //testPackPool();
 
     //testThread();
-    //testTimer();
-    testFile();
+    testTimer();
+    //testFile();
 }

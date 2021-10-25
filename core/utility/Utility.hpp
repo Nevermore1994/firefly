@@ -13,7 +13,8 @@
 namespace firefly::Util {
 
 //time
-uint64_t nowTimestamp();
+using TimeStamp = uint64_t;
+TimeStamp nowTimeStamp();
 
 //random
 template<typename T>

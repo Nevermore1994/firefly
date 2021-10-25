@@ -14,7 +14,8 @@ Thread::Thread(const std::string& name)
     :name_(name)
     ,worker_(&Thread::process, this)
     ,isExit_(false)
-    ,isRunning_(false){
+    ,isRunning_(false)
+    ,lastRunTimeStamp_(0){
     func_ = nullptr;
 }
 
@@ -22,7 +23,8 @@ Thread::Thread(std::string&& name)
     :name_(std::move(name))
     ,worker_(&Thread::process, this)
     ,isExit_(false)
-    ,isRunning_(false){
+    ,isRunning_(false)
+    ,lastRunTimeStamp_(0){
     func_ = nullptr;
 }
 
@@ -63,8 +65,11 @@ void Thread::start() noexcept{
 void Thread::process() noexcept{
     setThreadName();
     while(!isExit_){
-        if(isRunning_ && func_){
-            func_();
+        if(isRunning_){
+            timerPool_.loop();
+            if(func_){
+                func_();
+            }
         } else {
             std::unique_lock<std::mutex> lock(mutex_);
             cond_.wait(lock, [&]{
@@ -83,3 +88,12 @@ void Thread::setThreadName() noexcept{
     pthread_setname_np(name_.c_str());
 #endif
 }
+
+TimerId Thread::runAt(uint64_t timeStamp, TimerCallback func) {
+    return timerPool_.runAt(timeStamp, std::move(func));
+}
+
+TimerId Thread::runAfter(uint64_t delayTime, TimerCallback func) {
+    return timerPool_.runAfter(delayTime, std::move(func));
+}
+

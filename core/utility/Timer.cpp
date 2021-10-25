@@ -30,8 +30,8 @@ Timer::Timer()
     
 }
 
-Timer::Timer(uint64_t timestamp, TimerCallback f)
-    : timerInfo(timestamp)
+Timer::Timer(uint64_t timeStamp, TimerCallback f)
+    : timerInfo(timeStamp)
     , func(std::move(f)){
     
 }

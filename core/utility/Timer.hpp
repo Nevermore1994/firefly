@@ -36,7 +36,7 @@ struct TimerInfo{
 
 struct Timer{
     Timer();
-    Timer(uint64_t timestamp, TimerCallback f);
+    Timer(uint64_t timeStamp, TimerCallback f);
     Timer(const Timer& timer) noexcept;
     Timer& operator=(const Timer& timer) noexcept;
     Timer(Timer&& timer) noexcept;

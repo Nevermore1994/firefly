@@ -10,6 +10,7 @@
 #include <string>
 #include <functional>
 #include <atomic>
+#include "TimerPool.hpp"
 #include "Utility.hpp"
 
 namespace firefly {
@@ -23,6 +24,7 @@ public:
         ,isRunning_(false)
         ,isExit_(false)
         ,worker_(&Thread::process, this)
+        ,lastRunTimeStamp_(0)
     {
         std::unique_lock<std::mutex> lock(mutex_);
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
@@ -34,24 +36,23 @@ public:
         ,isRunning_(false)
         ,isExit_(false)
         ,worker_(&Thread::process, this)
+        ,lastRunTimeStamp_(0)
     {
         std::unique_lock<std::mutex> lock(mutex_);
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
     }
     
     explicit Thread(std::string&& name);
-    
     explicit Thread(const std::string& name);
-    
     ~Thread() noexcept;
     
     void start() noexcept;
-    
     void pause() noexcept;
-    
     void resume() noexcept;
-    
     void stop() noexcept;
+    
+    TimerId runAt(uint64_t timeStamp, TimerCallback func);
+    TimerId runAfter(uint64_t delayTime, TimerCallback func); //ms
     
     template<class Func, typename ... Args>
     void setFunc(Func&& f, Args&& ... args) noexcept{
@@ -61,6 +62,18 @@ public:
 public:
     inline bool isRunning() const noexcept {
         return isRunning_.load();
+    }
+    
+    inline Util::TimeStamp getLastRunTimeStamp() const noexcept{
+        return lastRunTimeStamp_;
+    }
+    
+    inline std::thread::id getId() const noexcept{
+        return worker_.get_id();
+    }
+    
+    inline std::string getName() const noexcept{
+        return name_;
     }
 private:
     void process() noexcept;
@@ -73,6 +86,8 @@ private:
     std::thread worker_;
     std::mutex mutex_;
     std::condition_variable cond_;
+    Util::TimeStamp lastRunTimeStamp_ = 0;
+    TimerPool timerPool_;
 };
 
 }//end namespace firefly
