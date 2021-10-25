@@ -9,7 +9,7 @@
 #include <arpa/inet.h>
 #include <variant>
 
-namespace firefly::NetWork{
+namespace firefly::Network{
 
 enum class IPType{
     IPv4 = 1,

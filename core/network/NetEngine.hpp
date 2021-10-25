@@ -4,7 +4,7 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 
-namespace firefly::NetWork {
+namespace firefly::Network {
 
 class NetEngine{
 

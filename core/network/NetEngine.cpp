@@ -7,13 +7,13 @@
 #include "NetEngine.hpp"
 
 using namespace firefly;
-using namespace firefly::NetWork;
+using namespace firefly::Network;
 
-NetWork::NetEngine::NetEngine(){
+Network::NetEngine::NetEngine(){
     
 }
 
-NetWork::NetEngine::~NetEngine(){
+Network::NetEngine::~NetEngine(){
     
 }
 

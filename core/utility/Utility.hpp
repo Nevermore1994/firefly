@@ -10,7 +10,6 @@
 #include <string>
 #include <random>
 
-
 namespace firefly::Util {
 
 //time

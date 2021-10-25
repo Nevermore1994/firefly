@@ -10,7 +10,7 @@
 #include "Utility.hpp"
 #include "IPAddress.hpp"
 
-namespace firefly::NetWork{
+namespace firefly::Network{
 
 bool isIP(const std::string& str);
 bool isIPv6(const std::string& ipstr);

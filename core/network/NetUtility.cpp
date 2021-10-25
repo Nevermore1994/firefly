@@ -9,7 +9,7 @@
 #include <netdb.h>
 
 using namespace firefly;
-using namespace firefly::NetWork;
+using namespace firefly::Network;
 using namespace std::literals;
 
 bool isIP(const std::string& ipstr, IPType type){
@@ -24,27 +24,27 @@ bool isIP(const std::string& ipstr, IPType type){
     }
 }
 
-bool NetWork::isIP(const std::string& str) {
+bool Network::isIP(const std::string& str) {
     return isIPv6(str) || isIPv4(str);
 }
 
-bool NetWork::isIPv6(const std::string& ipstr){
+bool Network::isIPv6(const std::string& ipstr){
     return ::isIP(ipstr, IPType::IPv6);
 }
 
-bool NetWork::isIPv6(std::string&& ipstr){
+bool Network::isIPv6(std::string&& ipstr){
     return ::isIP(ipstr, IPType::IPv6);
 }
 
-bool NetWork::isIPv4(const std::string& ipstr){
+bool Network::isIPv4(const std::string& ipstr){
     return ::isIP(ipstr, IPType::IPv4);
 }
 
-bool NetWork::isIPv4(std::string&& ipstr){
+bool Network::isIPv4(std::string&& ipstr){
     return ::isIP(ipstr, IPType::IPv4);
 }
 
-IPAddressInfo NetWork::str2ip(const std::string& str){
+IPAddressInfo Network::str2ip(const std::string& str){
     IPAddressInfo address;
     if(isIPv6(str)){
         struct in6_addr addr{};
@@ -60,7 +60,7 @@ IPAddressInfo NetWork::str2ip(const std::string& str){
     return address;
 }
 
-std::string NetWork::ip2str(IPAddressInfo ip){
+std::string Network::ip2str(IPAddressInfo ip){
     char tempRes[128] = {0};
     if(ip.type == IPType::IPv4){
         struct in_addr addr = std::get<IPv4>(ip.ip);
@@ -95,7 +95,7 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
         
         while(info) {
             addrInfos.push_back(info);
-            info = result->ai_next;
+            info = info->ai_next;
         }
         freeaddrinfo(result);
         
@@ -123,7 +123,7 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
 }
 
 
-bool NetWork::parseHost(const std::string& host, IPAddressInfo& ipInfo){
+bool Network::parseHost(const std::string& host, IPAddressInfo& ipInfo){
     std::variant<SocketAddress, SocketAddressv6> info;
     auto isSuccess = parseHostAddr(host, info);
     if(!isSuccess){
