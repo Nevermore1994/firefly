@@ -4,6 +4,7 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #include "TimerPool.hpp"
+#include "Utility.hpp"
 #include <chrono>
 
 using namespace firefly;
@@ -14,13 +15,13 @@ TimerPool::~TimerPool(){
     clear();
 }
 
-TimerPool::TimerPool(TimerPool&& lhs) {
+TimerPool::TimerPool(TimerPool&& lhs) noexcept {
     clear();
     timerInfos_.swap(lhs.timerInfos_);
     timers_.swap(lhs.timers_);
 }
 
-TimerPool& TimerPool::operator=(TimerPool&& lhs) {
+TimerPool& TimerPool::operator=(TimerPool&& lhs) noexcept {
     clear();
     timerInfos_.swap(lhs.timerInfos_);
     timers_.swap(lhs.timers_);

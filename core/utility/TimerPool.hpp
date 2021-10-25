@@ -8,7 +8,7 @@
 #include <memory>
 #include <queue>
 #include <unordered_map>
-#include "Thread.hpp"
+#include <mutex>
 #include "Timer.hpp"
 
 namespace firefly{
@@ -19,8 +19,8 @@ public:
     ~TimerPool();
     TimerPool(const TimerPool&) = delete;
     TimerPool& operator=(const TimerPool&) = delete;
-    TimerPool(TimerPool&&);
-    TimerPool& operator=(TimerPool&&);
+    TimerPool(TimerPool&&) noexcept ;
+    TimerPool& operator=(TimerPool&&) noexcept ;
     
     TimerId runAt(uint64_t timeStamp, TimerCallback func);
     TimerId runAfter(uint64_t delayTime, TimerCallback func); //ms

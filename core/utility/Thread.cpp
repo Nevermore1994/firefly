@@ -4,9 +4,10 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 
+#ifndef __APPLE__
 #include <pthread.h>
+#endif
 #include "Thread.hpp"
-#include "Utility.hpp"
 
 using namespace firefly;
 
