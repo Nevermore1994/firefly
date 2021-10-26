@@ -30,7 +30,7 @@ public:
     ThreadManager& operator=(ThreadManager&&) = delete;
     
     void add(std::shared_ptr<Thread> thread);
-    void remove(std::shared_ptr<Thread> thread);
+    void remove(const std::shared_ptr<Thread>& thread);
     void remove(std::thread::id id);
     
     Thread& thisThread();

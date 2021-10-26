@@ -15,10 +15,19 @@
 
 namespace firefly::Network{
 
-struct DnsParserInfo{
+struct DnsHostInfo{
     std::string uuid;
     std::string host;
+};
+
+using DnsParserCallBack = std::function<void(DnsHostInfo,IPAddressInfo)>;
+struct DnsParserRequest{
+    DnsHostInfo info;
+    DnsParserCallBack callBack;
     
+    DnsParserRequest() = default;
+    ~DnsParserRequest() = default;
+    DnsParserRequest(DnsHostInfo&& info, DnsParserCallBack callBack);
 };
 
 class DnsParserManager {
@@ -36,16 +45,19 @@ public:
     DnsParserManager(DnsParserManager&&) = delete;
     DnsParserManager& operator=(DnsParserManager&&) = delete;
     
-    void addRequest(DnsParserInfo&& info) noexcept;
+    static bool parseHost(const std::string& host, IPAddressInfo& ip) noexcept;
+    static bool parseHost(std::string&& host, IPAddressInfo& ip) noexcept;
+    void parseHost(DnsParserRequest&& info) noexcept;
 private:
     DnsParserManager();
     
     void process() noexcept;
+    void addRequest(DnsParserRequest&& info) noexcept;
 private:
     std::unordered_multimap<std::string, IPAddressInfo> ipLists_;
-    std::deque<DnsParserInfo> requests_;
+    std::deque<DnsParserRequest> requests_;
     std::mutex mutex_;
-    std::unique_ptr<Thread> work_;
+    std::shared_ptr<Thread> work_;
 };
 
 }

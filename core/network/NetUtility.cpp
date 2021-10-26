@@ -87,7 +87,7 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
     
     constexpr static const char* kService = "http";
     struct addrinfo *result = nullptr;
-    auto res = getaddrinfo(host.c_str(), kService, &hints, &result);
+    auto res = getaddrinfo(host.c_str(), kService, &hints, &result);//getaddrinfo function is reentrant
     
     if (res == 0) {
         struct addrinfo* info = result;

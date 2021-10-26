@@ -26,7 +26,7 @@ void ThreadManager::add(std::shared_ptr<Thread> thread) {
     threadInfos_.emplace(std::make_pair(thread->getId(), std::move(thread)));
 }
 
-void ThreadManager::remove(std::shared_ptr<Thread> thread) {
+void ThreadManager::remove(const std::shared_ptr<Thread>& thread) {
     std::unique_lock<std::mutex> lock(mutex_);
     threadInfos_.erase(thread->getId());
 }

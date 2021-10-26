@@ -9,11 +9,11 @@
 using namespace firefly;
 using namespace firefly::Network;
 
-Network::NetEngine::NetEngine(){
+NetEngine::NetEngine(){
     
 }
 
-Network::NetEngine::~NetEngine(){
+NetEngine::~NetEngine(){
     
 }
 
