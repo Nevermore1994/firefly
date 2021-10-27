@@ -25,8 +25,8 @@ Thread::Thread(std::string&& name)
     ,worker_(&Thread::process, this)
     ,isExit_(false)
     ,isRunning_(false)
-    ,lastRunTimeStamp_(0){
-    func_ = nullptr;
+    ,lastRunTimeStamp_(0)
+    ,func_(nullptr){
 }
 
 Thread::~Thread() noexcept{
@@ -67,6 +67,7 @@ void Thread::process() noexcept{
     setThreadName();
     while(!isExit_){
         if(isRunning_){
+            lastRunTimeStamp_ = Util::nowTimeStamp();
             timerPool_.loop();
             if(func_){
                 func_();

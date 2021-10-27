@@ -92,21 +92,24 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
     if (res == 0) {
         struct addrinfo* info = result;
         std::vector<struct addrinfo*> addrInfos;
+        char m_ipaddr[16];
         
         while(info) {
-            addrInfos.push_back(info);
+            if(info->ai_family == PF_INET || info->ai_family == PF_INET6 || info->ai_family == PF_UNSPEC){
+                addrInfos.push_back(info);
+            }
             info = info->ai_next;
         }
-        freeaddrinfo(result);
         
         if(addrInfos.empty()){
+            freeaddrinfo(result);
             return false;
         }
         
         int size = static_cast<int>(addrInfos.size());
         auto random = Util::random(0, size - 1);
         auto resInfo = addrInfos[random];
-        if(resInfo->ai_family == AF_INET){
+        if(resInfo->ai_family == PF_INET6){
             struct sockaddr_in6 sa{};
             memcpy(&sa, resInfo -> ai_addr, resInfo -> ai_addrlen);
             ipInfo.emplace<struct sockaddr_in6>(sa);
@@ -115,6 +118,7 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
             memcpy(&sa, resInfo -> ai_addr, resInfo -> ai_addrlen);
             ipInfo.emplace<struct sockaddr_in>(sa);
         }
+        freeaddrinfo(result);
         return true;
     } else {
         gai_strerror(res);
