@@ -74,3 +74,21 @@ void DnsParserManager::parseHost(DnsParserRequest&& info) noexcept {
     addRequest(std::move(info));
 }
 
+std::string DnsParserManager::getMyHost() noexcept {
+    if(myHost_.empty()){
+        init();
+    }
+    return myHost_;
+}
+
+IPAddressInfo DnsParserManager::getMyIP() noexcept {
+    if(myHost_.empty()){
+        init();
+    }
+    return myIP_;
+}
+
+void DnsParserManager::init() noexcept {
+
+}
+

@@ -6,7 +6,6 @@
 #pragma once
 
 #include <string>
-#include <any>
 #include "Utility.hpp"
 #include "IPAddress.hpp"
 
@@ -24,6 +23,7 @@ IPAddressInfo str2ip(const std::string& str);
 std::string ip2str(IPAddressInfo ip);
 
 bool parseHost(const std::string& host, IPAddressInfo& ip);
-
+std::string getHostName();
+bool reverseIPInfo(const IPAddressInfo& ip, std::string& host);
 }
 

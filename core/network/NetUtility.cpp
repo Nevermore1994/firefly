@@ -7,6 +7,7 @@
 #include <regex>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <unistd.h>
 
 using namespace firefly;
 using namespace firefly::Network;
@@ -69,7 +70,7 @@ std::string Network::ip2str(IPAddressInfo ip){
         struct in6_addr addr = std::get<IPv6>(ip.ip);
         inet_ntop(AF_INET6, &addr,tempRes, sizeof(tempRes));
     }
-    return {tempRes};
+    return {tempRes}; //std::string first '\0'.
 }
 
 bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAddressv6>& ipInfo)
@@ -147,5 +148,41 @@ bool Network::parseHost(const std::string& host, IPAddressInfo& ipInfo){
         ipInfo.type = IPType::IPv6;
     }
     return true;
+}
+
+std::string Network::getHostName() {
+    constexpr const uint16_t kMaxHostNameLength = 256;
+    char host[kMaxHostNameLength] = {0};
+    gethostname(host, sizeof(host));
+    return {host};
+}
+
+bool Network::reverseIPInfo(const IPAddressInfo& ip, std::string& addr) {
+    constexpr const uint16_t kMaxHostLength = 1024;
+    char h[kMaxHostLength] = {0};
+    if(ip.type == IPType::Unkonw){
+        return false;
+    }
+    auto p = std::get_if<IPv4>(&ip.ip);
+    int res = 0;
+    if(p != nullptr){
+        SocketAddress sa{};
+        sa.sin_family = AF_INET;
+        memcpy(&sa.sin_addr, &p->s_addr, sizeof(sa.sin_addr));
+        res = getnameinfo(reinterpret_cast<const struct sockaddr*>(&sa), sizeof(SocketAddress), h, sizeof(h), nullptr, 0, NI_NUMERICHOST);
+    } else {
+        auto t = std::get_if<IPv6>(&ip.ip);
+        if(t == nullptr){
+            return false;
+        }
+        SocketAddressv6 sa{};
+        sa.sin6_family = AF_INET6;
+        sa.sin6_addr = *t;
+        res = getnameinfo(reinterpret_cast<const struct sockaddr*>(&sa), sizeof(SocketAddressv6), h, sizeof(h), nullptr, 0, NI_NUMERICHOST);
+    }
+    if(res == 0){
+        addr = std::move(std::string(h));
+    }
+    return res == 0;
 }
 
