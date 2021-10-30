@@ -10,6 +10,7 @@
 #include <deque>
 #include <mutex>
 #include <memory>
+#include <future>
 #include "Thread.hpp"
 #include "IPAddress.hpp"
 
@@ -63,6 +64,8 @@ private:
     std::shared_ptr<Thread> work_;
     std::string myHost_;
     IPAddressInfo myIP_;
+    bool isInitialize_ = false;
+    std::once_flag flag_;
 };
 
 }

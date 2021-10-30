@@ -40,7 +40,11 @@ Thread& ThreadManager::thisThread() {
     std::unique_lock<std::mutex> lock(mutex_);
     auto id = std::this_thread::get_id();
     if(threadInfos_.count(id)){
-        return *threadInfos_[id];
+        auto thread = threadInfos_[id];
+        if(thread.expired()){
+            throw std::runtime_error("this thread is expired.");
+        }
+        return *thread.lock();
     } else {
         throw std::runtime_error("this thread not belong to ThreadManager.");
     }
@@ -50,11 +54,21 @@ void ThreadManager::reportRunInfo() noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     TimeStamp now = nowTimeStamp();
     logi("ThreadManager report now:%llu, thread:%lu", now, threadInfos_.size());
+    //todo replace C++20 std::erase_if
+    std::vector<std::thread::id> expiredThreads;
     for(auto& pair:threadInfos_){
-        auto thread = pair.second;
+        auto t = pair.second;
+        if(t.expired()){
+            expiredThreads.push_back(pair.first);
+            continue;
+        }
+        auto thread = t.lock();
         TimeStamp interval = (now - thread->getLastRunTimeStamp());
         if(thread->isRunning() && interval >= kMaxTimeInterval){
             loge("ThreadManager report [%s] is blocking.", thread->getName().c_str());
         }
+    }
+    for(auto key:expiredThreads){
+        threadInfos_.erase(key);
     }
 }

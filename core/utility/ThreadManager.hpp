@@ -37,7 +37,7 @@ public:
 private:
     void reportRunInfo() noexcept;
 private:
-    std::unordered_map<std::thread::id, std::shared_ptr<Thread>> threadInfos_;
+    std::unordered_map<std::thread::id, std::weak_ptr<Thread>> threadInfos_;
     std::mutex mutex_;
 };
 

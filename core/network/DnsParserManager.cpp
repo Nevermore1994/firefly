@@ -59,7 +59,7 @@ void DnsParserManager::process() noexcept {
 }
 
 bool DnsParserManager::parseHost(const std::string& host, IPAddressInfo& ip) noexcept {
-    auto res = std::async(std::launch::async, [&host,&ip](){
+    auto res = std::async(std::launch::async, [&host, &ip](){
        return Network::parseHost(host, ip);
     });
     res.wait();
@@ -75,20 +75,31 @@ void DnsParserManager::parseHost(DnsParserRequest&& info) noexcept {
 }
 
 std::string DnsParserManager::getMyHost() noexcept {
-    if(myHost_.empty()){
+    if(!isInitialize_){
         init();
     }
     return myHost_;
 }
 
 IPAddressInfo DnsParserManager::getMyIP() noexcept {
-    if(myHost_.empty()){
+    if(!isInitialize_){
         init();
     }
     return myIP_;
 }
 
 void DnsParserManager::init() noexcept {
-
+    std::call_once(flag_, [this](){
+        auto res = std::async(std::launch::async, [this](){
+            bool isSuccess = false;
+            this->myHost_ = Network::getHostName();
+            isSuccess = Network::getLocalAddress(this->myIP_);
+            return isSuccess;
+        });
+        res.get();
+        this->isInitialize_ = true;
+    });
+    
 }
+
 
