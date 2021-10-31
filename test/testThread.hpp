@@ -1,8 +1,7 @@
 //
-//  testThread.hpp
-//  firefly
-//
-//  Created by 谭平 on 2021/9/29.
+// Created by Nevermore on 2021/10/22.
+// firefly test/testThread
+// Copyright (c) 2021 Nevermore All rights reserved.
 //
 
 #pragma once

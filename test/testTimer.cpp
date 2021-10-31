@@ -1,5 +1,7 @@
 //
-// Created by 谭平 on 2021/10/11.
+// Created by Nevermore on 2021/10/22.
+// firefly test/testTimer
+// Copyright (c) 2021 Nevermore All rights reserved.
 //
 
 #include "testTimer.hpp"
