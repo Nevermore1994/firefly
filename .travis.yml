@@ -2,42 +2,34 @@ language: cpp
 sudo: required
 
 matrix:
-    include:
-        -   os: linux
-            addons:
-                apt:
-                    sources:
-                        - ubuntu-toolchain-r-test
-                    packages:
-                        - gcc-11
-                        - g++-11
-                        - cmake
-            env:
-                - COMPILER=g++-10
-                - CC_COMPILER=gcc-10
-    include:
-        -   os: linux
-            addons:
-                apt:
-                    sources:
-                        - ubuntu-toolchain-r-test
-                        - llvm-toolchain-precise-10
-                    packages:
-                        - cmake
-                        - clang-10
-                        - wget
-                        - cpputest
-            env:
-                - COMPILER=clang++-10
-                - CC_COMPILER=clang-10
-
-    include:
-        -   os: osx
-                osx_image: xcode12.5
-
-before_install:
-    - eval "${MATRIX_EVAL}"
-    - sudo apt-get install gcc-11 g++-11
+    -   os: linux
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                packages:
+                    - gcc-11
+                    - g++-11
+                    - cmake
+        env:
+            - COMPILER=g++-10
+            - CC_COMPILER=gcc-10
+    -   os: linux
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                    - llvm-toolchain-precise-10
+                packages:
+                    - cmake
+                    - clang-10
+                    - wget
+                    - cpputest
+        env:
+            - COMPILER=clang++-10
+            - CC_COMPILER=clang-10
+    -   os: osx
+            osx_image: xcode12.5
 
 before_install:
     - eval "${MATRIX_EVAL}"
@@ -49,6 +41,10 @@ compiler:
 branches:
     - main
     - develop
+
+before_script:
+  - export CC=$CC_COMPILER
+  - export CXX=$COMPILER
 
 script:
     - cd $TRAVIS_BUILD_DIR
