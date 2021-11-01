@@ -30,3 +30,26 @@
 *.exe
 *.out
 *.app
+
+#xcode config
+*.xcodeproj
+*.xcodeworkspace
+xcuserdata
+*.pbxproj
+/CMakeCache.txt
+*.check_cache
+*.cmake
+*.log
+/CMakeFiles
+*.bin
+*.make
+*.ts
+/Makefile
+/bin
+/.idea/dictionaries/*.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml
+/.idea/firefly.iml
+/firefly.cbp
+*.xml
