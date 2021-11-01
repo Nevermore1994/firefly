@@ -4,12 +4,14 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #include "NetUtility.hpp"
+#include "Log.hpp"
 #include <regex>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
 #include <ifaddrs.h>
-#include "Log.hpp"
+#include <cstring>
+
 
 using namespace firefly;
 using namespace firefly::Network;

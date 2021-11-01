@@ -9,6 +9,8 @@
 #include <cstdint>
 #include <memory>
 #include <iostream>
+#include <cstring>
+
 namespace firefly {
 
 constexpr uint16_t kPacketTypeLittleValue = 256;
