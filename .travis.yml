@@ -4,19 +4,33 @@ sudo: required
 
 #linux
 matrix:
-    include:
-        - os: linux
-          addons:
-              apt:
-                  sources:
-                      - ubuntu-toolchain-r-test
-                  packages:
-                      - cmake
-                      - gcc-11
-                      - g++-11
-          env:
-              - MATRIX_EVAL="CC=gcc-11 && CXX=g++-11"
+include:
+    -   os: linux
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                packages:
+                    - cmake
+                    - gcc-11
+                    - g++-11
+                env:
+                    - MATRIX_EVAL="CC=gcc-11 && CXX=g++-11"
 
+    -   os: linux
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                    - llvm-toolchain-precise-10
+                packages:
+                    - cmake
+                    - clang-10
+                    - wget
+                    - cpputest
+                env:
+                    - COMPILER=clang++-10
+                    - CC_COMPILER=clang-10
 before_script:
     - export CC=$CC_COMPILER
     - export CXX=$COMPILER
