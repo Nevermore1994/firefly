@@ -1,8 +1,12 @@
 language: cpp
+dist: bionic
 sudo: required
 
-#linux gcc
-matrix:
+compiler:
+    - clang
+    - gcc
+
+jobs:
     include:
         - os: linux
           addons:
@@ -32,6 +36,7 @@ matrix:
 
 before_install:
     - eval "${MATRIX_EVAL}"
+    - sudo apt-get update
     - sudo apt-get install gcc-10 g++-10
     - sudo apt-get install clang-10 lldb-10 lld-10
 
