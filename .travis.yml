@@ -12,7 +12,7 @@ jobs:
                   packages:
                       - gcc-10
           env:
-              - MATRIX_EVAL="CC=gcc-10 CXX=g++-10" CONF="--disable-zeromq --disable-output-uhd"
+              - MATRIX_EVAL="CC=gcc-10 CXX=g++-10"
           arch: amd64
           compiler: gcc
 
@@ -36,7 +36,7 @@ jobs:
 
 before_install:
     - eval "${MATRIX_EVAL}"
-    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-get install clang; fi
+    - if [ $TRAVIS_OS_NAME == linux ]; then apt-get update  && apt-get install gcc-10 && apt-get install clang-10; fi
 
 branches:
     - main
