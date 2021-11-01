@@ -1,10 +1,14 @@
 language: cpp
-dist: bionic
 sudo: required
+
+before_install:
+    - eval "${MATRIX_EVAL}"
+    - sudo apt-get install gcc-11 g++-11
+    - sudo apt-get install clang-12 clang++-12
 
 jobs:
     include:
-        -   os: linux
+        -   compiler: gcc
             addons:
                 apt:
                     sources:
@@ -16,19 +20,22 @@ jobs:
                     env:
                         - MATRIX_EVAL="CC=gcc-11 && CXX=g++-11"
 
-        -   os: linux
+        -   compiler: clang
             addons:
                 apt:
                     sources:
                         - ubuntu-toolchain-r-test
-                        - llvm-toolchain-precise-10
+                        - llvm-toolchain-precise-12
                     packages:
                         - cmake
-                        - clang-10
+                        - clang-12
                         - wget
                     env:
-                        - COMPILER=clang++-10
-                        - CC_COMPILER=clang-10
+                        - COMPILER=clang++-12
+                        - CC_COMPILER=clang-12
+        -   os: osx
+            osx_image: xcode12.5
+
 before_script:
     - export CC=$CC_COMPILER
     - export CXX=$COMPILER
