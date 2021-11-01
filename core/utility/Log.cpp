@@ -5,6 +5,7 @@
 //
 #include "Log.hpp"
 #include "date.h"
+#include <cstdarg>
 
 //todo:platform log
 using namespace firefly;
