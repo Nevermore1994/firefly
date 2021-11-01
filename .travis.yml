@@ -1,10 +1,6 @@
 language: cpp
-dist: bionic
+dist: focal
 sudo: required
-
-compiler:
-    - clang
-    - gcc
 
 jobs:
     include:
@@ -16,7 +12,9 @@ jobs:
                   packages:
                       - gcc-10
           env:
-              - MATRIX_EVAL="CC=gcc-10 && CXX=g++-10"
+              - MATRIX_EVAL="CC=gcc-10 CXX=g++-10" CONF="--disable-zeromq --disable-output-uhd"
+          arch: amd64
+          compiler: gcc
 
         -   os: linux
             addons:
@@ -30,15 +28,15 @@ jobs:
                         - wget
             env:
                 - MATRIX_EVAL="CC=clang-10 && CXX=clang++-10"
+            arch: amd64
+            compiler: clang
 
         -   os: osx
             osx_image: xcode12.5
 
 before_install:
     - eval "${MATRIX_EVAL}"
-    - sudo apt-get update
-    - sudo apt-get install gcc-10 g++-10
-    - sudo apt-get install clang-10 lldb-10 lld-10
+    - if [ $TRAVIS_OS_NAME == linux ]; then sudo apt-get update && sudo apt-get install clang; fi
 
 branches:
     - main
