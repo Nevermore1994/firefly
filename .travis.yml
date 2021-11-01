@@ -1,50 +1,28 @@
 language: cpp
 sudo: required
 
+#linux
 matrix:
-    -   os: linux
-        addons:
-            apt:
-                sources:
-                    - ubuntu-toolchain-r-test
-                packages:
-                    - gcc-11
-                    - g++-11
-                    - cmake
-        env:
-            - COMPILER=g++-10
-            - CC_COMPILER=gcc-10
-    -   os: linux
-        addons:
-            apt:
-                sources:
-                    - ubuntu-toolchain-r-test
-                    - llvm-toolchain-precise-10
-                packages:
-                    - cmake
-                    - clang-10
-                    - wget
-                    - cpputest
-        env:
-            - COMPILER=clang++-10
-            - CC_COMPILER=clang-10
-    -   os: osx
-            osx_image: xcode12.5
+    include:
+        - os: linux
+          addons:
+              apt:
+                  sources:
+                      - ubuntu-toolchain-r-test
+                  packages:
+                      - cmake
+                      - gcc-11
+                      - g++-11
+          env:
+              - MATRIX_EVAL="CC=gcc-11 && CXX=g++-11"
 
-before_install:
-    - eval "${MATRIX_EVAL}"
-
-compiler:
-    - gcc
-    - clang
+before_script:
+    - export CC=$CC_COMPILER
+    - export CXX=$COMPILER
 
 branches:
     - main
     - develop
-
-before_script:
-  - export CC=$CC_COMPILER
-  - export CXX=$COMPILER
 
 script:
     - cd $TRAVIS_BUILD_DIR
