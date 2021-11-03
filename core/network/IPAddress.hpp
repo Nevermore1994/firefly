@@ -12,7 +12,7 @@
 namespace firefly::Network{
 
 enum class IPType{
-    Unkonw = 0,
+    Unknown = 0,
     IPv4 = 1,
     IPv6,
 };
@@ -29,7 +29,7 @@ struct IPAddressInfo{
     IPType type;
     
     IPAddressInfo()
-        :type(IPType::Unkonw){
+        :type(IPType::Unknown){
         
     }
 };

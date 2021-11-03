@@ -10,12 +10,14 @@
 #include <string>
 #include <functional>
 #include <atomic>
+#include <string_view>
 #include "TimerPool.hpp"
 #include "Utility.hpp"
+#include "NoCopyable.hpp"
 
 namespace firefly {
 
-class Thread{
+class Thread:public NoCopyable{
 
 public:
     template<class Func, typename ... Args>
@@ -72,8 +74,8 @@ public:
         return worker_.get_id();
     }
     
-    inline std::string getName() const noexcept{
-        return name_;
+    inline std::string_view getName() const noexcept{
+        return std::string_view (name_);
     }
 private:
     void process() noexcept;

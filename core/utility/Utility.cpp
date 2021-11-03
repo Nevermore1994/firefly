@@ -36,7 +36,7 @@ std::string Util::randomString(uint32_t length) {
     return result;
 }
 
-uint64_t Util::randomId(uint32_t length) {
+uint64_t Util::randomId(uint8_t length) {
     if(length >= 18){
         throw std::runtime_error("randomId error");
     }

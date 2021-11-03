@@ -25,5 +25,5 @@ inline void runTest(){
     parseHost("baidu.com", ip);
     std::cout << ip2str(ip) << std::endl;
     
-    std::cout << ip2str(DnsParserManager::shareInstance().getMyIP()) << std::endl;
+    std::cout << "main:" << ip2str(DnsParserManager::shareInstance().getMyIP()) << std::endl;
 }

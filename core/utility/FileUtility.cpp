@@ -58,9 +58,9 @@ bool FileUtil::renameFile(const std::string& oldName, const std::string& newName
 }
 
 int64_t FileUtil::getFileSize(const std::string& path){
-    struct stat statbuf;
-    if (stat(path.c_str(), &statbuf) == 0)
-        return statbuf.st_size;
+    struct stat statBuffer{};
+    if (stat(path.c_str(), &statBuffer) == 0)
+        return statBuffer.st_size;
     return -1;
 }
 
@@ -73,21 +73,21 @@ bool FileUtil::removeDir(const std::string& path, bool isRetain){
         return true;
     }
     DIR* dir = nullptr;
-    struct dirent* dirinfo = nullptr;
-    struct stat statbuf;
-    lstat(path.c_str(), &statbuf);
+    struct dirent* dirInfo = nullptr;
+    struct stat statBuffer{};
+    lstat(path.c_str(), &statBuffer);
     bool res = true;
     
-    if (S_ISREG(statbuf.st_mode)){
+    if (S_ISREG(statBuffer.st_mode)){
         remove(path.c_str());
-    } else if (S_ISDIR(statbuf.st_mode)){
-        if ((dir = opendir(path.c_str())) == NULL)
+    } else if (S_ISDIR(statBuffer.st_mode)){
+        if ((dir = opendir(path.c_str())) == nullptr)
             return true;
-        while ((dirinfo = readdir(dir)) != NULL){
+        while ((dirInfo = readdir(dir)) != nullptr){
             std::string filePath = path;
             filePath.append("/");
-            filePath.append(dirinfo->d_name);
-            if (strcmp(dirinfo->d_name, ".") == 0 || strcmp(dirinfo->d_name, "..") == 0)
+            filePath.append(dirInfo->d_name);
+            if (strcmp(dirInfo->d_name, ".") == 0 || strcmp(dirInfo->d_name, "..") == 0)
                 continue;
             res = res && removeDir(filePath);
             if (isRetain){

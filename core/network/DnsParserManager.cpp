@@ -6,7 +6,9 @@
 #include "DnsParserManager.hpp"
 #include "ThreadManager.hpp"
 #include "NetUtility.hpp"
+#include "Log.hpp"
 #include <future>
+
 
 using namespace firefly;
 using namespace firefly::Network;

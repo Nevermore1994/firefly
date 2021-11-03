@@ -5,6 +5,7 @@
 //
 #pragma once
 #include <iostream>
+#include "NoCopyable.hpp"
 
 namespace firefly::FileUtil{
 
@@ -19,7 +20,7 @@ enum class FileMode
     FreeMode = 2
 };
 
-class IFile
+class IFile:public NoCopyable
 {
 public:
     explicit IFile(const std::string& path, FileMode mode);
@@ -45,7 +46,7 @@ class WriteFile:virtual public IFile
 public:
     explicit WriteFile(const std::string& path);
     explicit WriteFile(std::string&& path);
-    virtual ~WriteFile();
+    ~WriteFile() override;
     void write(const std::string& str);
     void write(std::string&& str);
     void write(const uint8_t* data, uint32_t size);
@@ -67,13 +68,13 @@ class ReadFile:virtual public IFile
 public:
     explicit ReadFile(std::string&& path);
     explicit ReadFile(const std::string& path);
-    virtual ~ReadFile();
+    ~ReadFile() override;
     std::string readLine();
     char readCh();
     void backFillChar(char ch);
     std::string readWord();
-    inline bool readOver() const { return readOver_;}
-    inline uint64_t readSize() const { return readSize_; }
+    inline bool readOver() const noexcept { return readOver_;}
+    inline uint64_t readSize() const noexcept { return readSize_; }
 
 public:
     bool open() override;
@@ -88,9 +89,9 @@ protected:
 class File final:public ReadFile, public WriteFile
 {
 public:
-    File(const std::string& path);
-    File(std::string&& path);
-    virtual ~File();
+    explicit File(const std::string& path);
+    explicit File(std::string&& path);
+    ~File() override;
 
 public:
     bool open() final;

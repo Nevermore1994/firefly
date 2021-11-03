@@ -24,11 +24,11 @@ public:
     
     MemoryPool(const MemoryPool&) = delete;
     
-    MemoryPool(const MemoryPool&&) = delete;
+    MemoryPool(MemoryPool&&) = delete;
     
     MemoryPool& operator=(const MemoryPool&) = delete;
     
-    MemoryPool& operator=(const MemoryPool&&) = delete;
+    MemoryPool& operator=(MemoryPool&&) = delete;
     
     ~MemoryPool(){
         release();
