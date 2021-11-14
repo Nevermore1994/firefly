@@ -11,13 +11,14 @@
 #include <memory>
 #include "IConnector.hpp"
 #include "Thread.hpp"
+#include "IPAddress.hpp"
+#include "NoCopyable.hpp"
 
 namespace firefly::Network {
 
-using Socket = int32_t;
 constexpr const int kMaxSocketSize = 255;
 
-class NetEngine{
+class NetEngine:public NoCopyable{
 
 public:
     inline static NetEngine& shareInstance(){
@@ -26,11 +27,6 @@ public:
     }
     
 public:
-    NetEngine(const NetEngine&) = delete;
-    NetEngine& operator=(const NetEngine&) = delete;
-    NetEngine(NetEngine&&) = delete;
-    NetEngine& operator=(NetEngine&&) = delete;
-    
     ~NetEngine();
 private:
     NetEngine();

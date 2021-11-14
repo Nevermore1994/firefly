@@ -176,6 +176,7 @@ bool Network::getLocalAddress(IPAddressInfo& ip){
             } else if (ifAddrStruct->ifa_addr->sa_family == AF_INET6) {
                 ip.ip = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_addr;
                 ip.type = IPType::IPv6;
+                ip.scopeID = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_scope_id;
             }
         }
         ifAddrStruct = ifAddrStruct->ifa_next;

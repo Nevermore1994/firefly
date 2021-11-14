@@ -9,20 +9,13 @@
 namespace firefly
 {
 
-enum class LinkType
-{
-    Unknown = 0,
-    UDP = 1,
-    TCP = 2,
-};
-
 class ILink
 {
 public:
     ILink() = default;
-    virtual ~ILink() = default;
 
 public:
+    virtual ~ILink() = default;
     virtual void onConnected() = 0;
     virtual void onError() = 0;
     virtual void onDataReceived(const char* data, uint32_t size, uint64_t receivedTimeStamp) = 0;

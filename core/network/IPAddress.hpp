@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <variant>
+#include <cassert>
 
 namespace firefly::Network{
 
@@ -17,8 +18,20 @@ enum class IPType{
     IPv6,
 };
 
+enum class LinkType
+{
+    Unknown = 0,
+    UDP = 1,
+    TCP = 2,
+};
+
+constexpr const int32_t kSocketInvalid = -1;
+
+using Socket = int32_t;
 using SocketAddress = struct sockaddr_in;
 using SocketAddressv6 = struct sockaddr_in6;
+using SocketAddr = std::variant<SocketAddress, SocketAddressv6>;
+
 using IPv4 = struct in_addr;
 using IPv6 = struct in6_addr;
 using IPAddr = std::variant<IPv4, IPv6>;
@@ -27,13 +40,32 @@ using Port = uint16_t;
 struct IPAddressInfo{
     IPAddr ip;
     IPType type;
+    uint32_t scopeID;
     
     IPAddressInfo()
-        :type(IPType::Unknown){
+        :type(IPType::Unknown)
+        ,scopeID(0){
         
     }
+    
+    IPv4 getIPv4();
+    IPv6 getIPv6();
 };
 
+struct SocketAddressInfo{
+    IPAddressInfo ipInfo;
+    Port  port;
+    SocketAddr socketInfo;
+    
+    SocketAddressInfo();
+    SocketAddressInfo(IPAddressInfo info, Port port);
+    uint32_t size() const noexcept;
+
+public:
+    inline bool isValid() const noexcept{
+        return ipInfo.type != IPType::Unknown;
+    }
+};
 
 }
 
