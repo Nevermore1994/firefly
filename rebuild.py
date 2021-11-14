@@ -31,14 +31,13 @@ root_path = os.getcwd()
 print(root_path)
 delete_cmake_cache(root_path)
 
-res = os.popen("cmake .", "r", 1).read()
-print(res)
+res = 0
+if len(sys.argv) >= 2 and (sys.argv[1] == "-b" or sys.argv[1] == "-r"):
+    res = os.system("cmake .")
+    res = os.system("cmake --build .")
 
-path = get_target_path(res)
-
-res = os.system("cmake --build .")
-
+exec_path = "./bin/firefly"
 if res == 0 and len(sys.argv) >= 2 and sys.argv[1] == "-r":
-    res = os.popen("chmod 777 " + path)
-    res = os.system("./bin/firefly")
+    res = os.popen("chmod 777 " + exec_path)
+    res = os.system(exec_path)
 
