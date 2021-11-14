@@ -53,3 +53,4 @@ xcuserdata
 /.idea/firefly.iml
 /firefly.cbp
 *.xml
+/build/compile_commands.json
