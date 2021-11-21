@@ -9,7 +9,7 @@
 
 namespace firefly::Network{
 
-class ConnectorManager {
+class ConnectorManager: public IConnectorHandler{
 public:
     static inline ConnectorManager& shareInstance() {
         static ConnectorManager instance;
@@ -19,9 +19,12 @@ public:
 public:
     ~ConnectorManager();
     
+    void reportError(Socket socket, ErrorInfo &&error) override;
+    void reportEvent(Socket socket, ConnectorEvent event) override;
+    void reportState(Socket socket, ConnectorState state) override;
 private:
     ConnectorManager();
-
+    
 private:
 };
 

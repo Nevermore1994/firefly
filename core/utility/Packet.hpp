@@ -54,12 +54,12 @@ struct Packet{
     }
 
     Packet(uint32_t size, PacketType type)
-            :buffer(std::make_unique<uint8_t[]>(size))
-            ,pos(0)
-            ,length(0)
-            ,size(size)
-            ,type(type)
-            ,timeStamp(0){
+        :buffer(std::make_unique<uint8_t[]>(size))
+        ,pos(0)
+        ,length(0)
+        ,size(size)
+        ,type(type)
+        ,timeStamp(0){
     }
 
     Packet(Packet& packet){

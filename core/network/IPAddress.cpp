@@ -62,3 +62,10 @@ uint32_t SocketAddressInfo::size() const noexcept {
     }
     return 0;
 }
+
+SocketAddr *SocketAddressInfo::addr() noexcept {
+    if(ipInfo.type != IPType::Unknown){
+        return reinterpret_cast<SocketAddr*>(&socketInfo);
+    }
+    return nullptr;
+}

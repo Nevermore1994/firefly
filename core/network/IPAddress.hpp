@@ -30,7 +30,8 @@ constexpr const int32_t kSocketInvalid = -1;
 using Socket = int32_t;
 using SocketAddress = struct sockaddr_in;
 using SocketAddressv6 = struct sockaddr_in6;
-using SocketAddr = std::variant<SocketAddress, SocketAddressv6>;
+using SocketAddr = sockaddr;
+using SocketAddrType = std::variant<SocketAddress, SocketAddressv6>;
 
 using IPv4 = struct in_addr;
 using IPv6 = struct in6_addr;
@@ -55,12 +56,12 @@ struct IPAddressInfo{
 struct SocketAddressInfo{
     IPAddressInfo ipInfo;
     Port  port;
-    SocketAddr socketInfo;
+    SocketAddrType socketInfo;
     
     SocketAddressInfo();
     SocketAddressInfo(IPAddressInfo info, Port port);
     uint32_t size() const noexcept;
-
+    SocketAddr* addr() noexcept;
 public:
     inline bool isValid() const noexcept{
         return ipInfo.type != IPType::Unknown;

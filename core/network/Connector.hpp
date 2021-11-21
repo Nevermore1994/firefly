@@ -8,21 +8,17 @@
 #include "IPAddress.hpp"
 #include "Utility.hpp"
 #include "Packet.hpp"
+#include "Buffer.hpp"
 #include <memory>
 #include <list>
 
 namespace firefly::Network{
 
-constexpr uint32_t kReceiveBufferSize = 2 * 1024 * 1024;
+constexpr uint32_t kReceiveBufferSize = 2 * 1024 * 1024;//2MB
 constexpr uint32_t kSendBufferSize = 2 * 1024 * 1024;
+constexpr uint32_t kReceiveSize = 1024 * 512; //512kb
 
-enum class ConnectorState{
-    Unknown = 0,
-    Init,
-    Connecting,
-    Connected,
-    Disconnected,
-};
+using ReceiveBuffer = Buffer<char, kReceiveBufferSize * 2>;
 
 struct ConnectorInfo{
     bool isBindPort{};
@@ -65,10 +61,10 @@ public:
     bool isReadable() const noexcept override;
     bool isWriteable() const noexcept override;
     bool open(IPAddressInfo ip, Port port) noexcept override;
-    bool open(SocketAddressInfo ipInfo) noexcept;
+    bool open(SocketAddressInfo ipInfo) noexcept override;
     void close() noexcept override;
     void onReceived() override;
-    void onError() override;
+    void onError(ErrorInfo&& info) override;
     void onSend() override;
 
 public:
@@ -94,17 +90,26 @@ public:
     inline Socket getSocket() const noexcept{
         return socket_;
     }
+    
+    inline bool isValid() const noexcept{
+        return state_ != ConnectorState::Error && state_ != ConnectorState::Disconnected;
+    }
 private:
-    void initData() noexcept;
+    bool initData() noexcept;
     bool open() noexcept;
     bool setSocketConfig(int32_t level, int32_t optName, const char* value, size_t size) const;
+    void setState(ConnectorState state) noexcept;
+    void setEvent(ConnectorEvent event) noexcept;
+    void reportErrorInfo() noexcept;
 private:
     std::unique_ptr<ConnectorInfo> info_;
     ConnectorState  state_;
     Socket  socket_;
     ConnectorID id_;
-    std::list<Packet> packets_;
+    ReceiveBuffer receiveBuffer_;
+    std::list<Packet> sendPackets_;
     bool isDelay_;
+    std::weak_ptr<IConnectorHandler> manager_;
 };
 
 }

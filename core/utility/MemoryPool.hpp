@@ -10,25 +10,18 @@
 #include <list>
 #include <memory>
 #include <algorithm>
+#include "NoCopyable.hpp"
 
 namespace firefly {
 
 template<class T, uint32_t BlockSize = 512>
-class MemoryPool{
+class MemoryPool: public NoCopyable{
     using ChunkType = std::list<std::shared_ptr<T>>;
 public:
     MemoryPool()
         :size_(BlockSize){
         
     }
-    
-    MemoryPool(const MemoryPool&) = delete;
-    
-    MemoryPool(MemoryPool&&) = delete;
-    
-    MemoryPool& operator=(const MemoryPool&) = delete;
-    
-    MemoryPool& operator=(MemoryPool&&) = delete;
     
     ~MemoryPool(){
         release();

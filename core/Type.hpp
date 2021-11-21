@@ -5,9 +5,15 @@
 //
 #pragma once
 #include <cstdint>
+#include <string>
 
 namespace firefly{
 
 constexpr int32_t kInvalid = -1;
+
+struct ErrorInfo{
+    std::string errorInfo;
+    uint32_t errorNumber;
+};
 
 }

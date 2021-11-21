@@ -177,7 +177,9 @@ void NetEngine::checkAllSocket(const std::vector<Socket>& readSockets, const std
             if(it != connectors_.end()){
                 auto connector = it->second;
                 connectors_.erase(socket);
-                connector->onError();
+                ErrorInfo errorInfo;
+                errorInfo.errorNumber = EBADF;
+                connector->onError(std::move(errorInfo));
             }
         }
     }
