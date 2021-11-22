@@ -10,6 +10,7 @@
 #include "NoCopyable.hpp"
 #include "IPAddress.hpp"
 #include "Type.hpp"
+#include "Packet.hpp"
 
 namespace firefly::Network{
 
@@ -42,6 +43,7 @@ public:
     virtual void reportState(Socket socket, ConnectorState state) = 0;
     virtual void reportEvent(Socket socket, ConnectorEvent event) = 0;
     virtual void reportError(Socket socket, ErrorInfo&& error) = 0;
+    virtual void reportData(Socket socket, std::shared_ptr<Packet> packet) = 0;
 };
 
 class IConnector:public NoCopyable{

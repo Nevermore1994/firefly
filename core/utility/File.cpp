@@ -101,20 +101,17 @@ void FileUtil::WriteFile::write(const uint8_t* data, uint32_t size){
 FileUtil::ReadFile::ReadFile(const std::string& path)
         :IFile(path, FileMode::ReadMode)
         ,readSize_(0)
-        ,readOver_(false)
-{
+        ,readOver_(false){
 }
 
 FileUtil::ReadFile::ReadFile(std::string&& path)
         :IFile(path, FileMode::ReadMode)
         ,readSize_(0)
-        ,readOver_(false)
-{
+        ,readOver_(false){
 
 }
 
-FileUtil::ReadFile::~ReadFile()
-{
+FileUtil::ReadFile::~ReadFile(){
 
 }
 
@@ -125,7 +122,7 @@ char FileUtil::ReadFile::readCh(){
             readOver_ = true;
         }
         readSize_++;
-        return ch;
+        return (char)ch;
     }
     return EOF;
 }
@@ -162,8 +159,9 @@ std::string FileUtil::ReadFile::readWord(){
 }
 
 bool FileUtil::ReadFile::open(){
-    if(path_.empty())
+    if(path_.empty()){
         return false;
+    }
     if(file_){
         return true;
     }
@@ -183,15 +181,13 @@ void FileUtil::ReadFile::close(){
 FileUtil::File::File(const std::string& path)
         :IFile(path, FileMode::FreeMode)
         ,WriteFile(path)
-        ,ReadFile(path)
-{
+        ,ReadFile(path){
 }
 
 FileUtil::File::File(std::string&& path)
         :IFile(path, FileMode::FreeMode)
         ,WriteFile(path)
-        ,ReadFile(path)
-{
+        ,ReadFile(path){
 
 }
 
@@ -199,8 +195,7 @@ FileUtil::File::~File(){
     flush();
 }
 
-bool FileUtil::File::open()
-{
+bool FileUtil::File::open(){
     if(path_.empty())
         return false;
     if(file_){

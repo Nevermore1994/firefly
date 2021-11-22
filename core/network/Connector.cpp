@@ -7,6 +7,7 @@
 #include "Log.hpp"
 #include "Type.hpp"
 #include "NetEngine.hpp"
+#include "PacketPool.hpp"
 #include <cstdint>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -24,10 +25,6 @@ Connector::Connector(std::unique_ptr<ConnectorInfo> info)
     if(info_->remoteIP.isValid()){
         open();
     }
-}
-
-Connector::~Connector() {
-    close();
 }
 
 bool Connector::initData() noexcept {
@@ -65,6 +62,7 @@ bool Connector::initData() noexcept {
         setDelay(true);
     }
     state_ = ConnectorState::Init;
+    logi("create socket success, id %d", socket_);
     return res;
 }
 
@@ -109,7 +107,7 @@ void Connector::onReceived() {
     }
     
     int32_t res = 1;
-    char buffer[kReceiveSize];
+    uint8_t buffer[kReceiveSize];
     uint32_t bufferSize = sizeof(buffer);
     if (info_->isTcpLink()){
         while(res){
@@ -118,12 +116,14 @@ void Connector::onReceived() {
                 if(errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN){
                     //not error, continue next
                 } else {
+                    loge("tcp receive, error: %s", strerror(errno));
                     reportErrorInfo();
                 }
-                break; //no block, no data
+                break; //no block, no data, or error
             } else if(res == 0) {
                 //remote socket shut down
             } else {
+                logi("tcp socket %d, receive data len %d", socket_, res);
                 receiveBuffer_.append(buffer, (uint32_t)res);
                 if(res < bufferSize || receiveBuffer_.size() >= kReceiveBufferSize){
                     break;
@@ -131,20 +131,23 @@ void Connector::onReceived() {
             }
         }
     } else if (info_->isUdpLink()) {
-        SocketAddr* addr = info_->remoteIP.addr();
+        SocketAddr addr = info_->remoteIP.addr();
         socklen_t addrLength = info_->remoteIP.size();
         while(res){
-            res = recvfrom(socket_, buffer, bufferSize, 0, addr, &addrLength);
+            res = recvfrom(socket_, buffer, bufferSize, 0, &addr, &addrLength);
             if(res < 0){
+                loge("udp receive, error: %s", strerror(errno));
                 reportErrorInfo();
+                break;
             } else if(res > 0){
+                logi("udp socket %d, receive data len %d", socket_, res);
                 receiveBuffer_.append(buffer, res);
             } else {
                 break;
             }
         }
     }
-    
+    postData();
 }
 
 void Connector::onSend() {
@@ -195,12 +198,14 @@ bool Connector::open() noexcept {
     
     //connect
     if(info_->isTcpLink()){
-        if (connect(socket_, info_->remoteIP.addr(), info_->remoteIP.size()) == kInvalid){
+        auto addr = info_->remoteIP.addr();
+        if (connect(socket_, &addr, info_->remoteIP.size()) == kInvalid){
             if(EINPROGRESS == errno){
-                return true;
+                res = true;
+            } else {
+                reportErrorInfo();
+                res = false;
             }
-            reportErrorInfo();
-            res = false;
         }
     } else {
         //set receiveBufferSize
@@ -269,6 +274,27 @@ void Connector::reportErrorInfo() noexcept {
     ErrorInfo errorInfo;
     errorInfo.errorNumber = errno;
     onError(std::move(errorInfo));
+}
+
+void Connector::postData() noexcept {
+    //post data
+    if(manager_.expired()){
+        loge("connector manger is invalid.");
+        return;
+    }
+    if(!receiveBuffer_.empty()){
+        uint32_t length = receiveBuffer_.size();
+        if(length <= 4){
+            //data length is short
+            return;
+        }
+        
+        auto packet = PacketPool::shareInstance().newPacket(receiveBuffer_.front(), length);
+        auto manager = manager_.lock();
+        if(manager){
+            manager->reportData(socket_, packet);
+        }
+    }
 }
 
 

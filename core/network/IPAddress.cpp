@@ -4,6 +4,7 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #include "IPAddress.hpp"
+#include <cstring>
 
 using namespace firefly::Network;
 
@@ -63,9 +64,12 @@ uint32_t SocketAddressInfo::size() const noexcept {
     return 0;
 }
 
-SocketAddr *SocketAddressInfo::addr() noexcept {
+SocketAddr SocketAddressInfo::addr() const noexcept {
+    SocketAddr addr;
     if(ipInfo.type != IPType::Unknown){
-        return reinterpret_cast<SocketAddr*>(&socketInfo);
+        memcpy(&addr, &socketInfo, size());
+        return addr;
     }
-    return nullptr;
+    assert(ipInfo.type == IPType::Unknown);
+    return addr;
 }

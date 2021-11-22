@@ -23,6 +23,7 @@ public:
     void append(T* data, uint32_t size) noexcept;
     void reset() noexcept;
     uint32_t read(T* data, uint32_t size) noexcept;
+    bool empty() const noexcept;
 public:
     inline uint32_t readPosition() const noexcept{
         return readPosition_;
@@ -44,8 +45,13 @@ public:
         return data_.get();
     }
     
+    inline T* front() noexcept{
+        assert(size() == 0);
+        return data_.get() + readPosition_ + 1;
+    }
+    
     inline T* back() noexcept{
-        return data_[writePosition_];
+        return data_.get() + writePosition_;
     }
     
 private:
@@ -80,8 +86,10 @@ template<typename T, uint32_t PresetBufferSize>
 void Buffer<T, PresetBufferSize>::reset() noexcept {
     if(data_){
         std::unique_lock<std::mutex> lock(mutex_);
-        data_.reset(std::make_unique<T[]>(PresetBufferSize));
-        capacity_ = 0;
+        if(capacity_ > PresetBufferSize){
+            data_.reset(std::make_unique<T[]>(PresetBufferSize));
+        }
+        capacity_ = PresetBufferSize;
         writePosition_ = 0;
         readPosition_ = 0;
     }
@@ -114,6 +122,11 @@ void Buffer<T, PresetBufferSize>::alloc() noexcept {
     memmove(temp.get(), data_.get() + readPosition_, surplusSize);
     writePosition_ = surplusSize;
     data_ = std::move(temp);
+}
+
+template<typename T, uint32_t PresetBufferSize>
+bool Buffer<T, PresetBufferSize>::empty() const noexcept {
+    return size() == 0;
 }
 
 }

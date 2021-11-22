@@ -18,7 +18,7 @@ constexpr uint32_t kReceiveBufferSize = 2 * 1024 * 1024;//2MB
 constexpr uint32_t kSendBufferSize = 2 * 1024 * 1024;
 constexpr uint32_t kReceiveSize = 1024 * 512; //512kb
 
-using ReceiveBuffer = Buffer<char, kReceiveBufferSize * 2>;
+using ReceiveBuffer = Buffer<uint8_t, kReceiveBufferSize * 2>;
 
 struct ConnectorInfo{
     bool isBindPort{};
@@ -54,7 +54,7 @@ public:
 class Connector:public IConnector{
 public:
     explicit Connector(std::unique_ptr<ConnectorInfo> info);
-    ~Connector();
+    ~Connector() = default;
 
 public:
     bool isActive() const noexcept override;
@@ -101,6 +101,7 @@ private:
     void setState(ConnectorState state) noexcept;
     void setEvent(ConnectorEvent event) noexcept;
     void reportErrorInfo() noexcept;
+    void postData() noexcept;
 private:
     std::unique_ptr<ConnectorInfo> info_;
     ConnectorState  state_;

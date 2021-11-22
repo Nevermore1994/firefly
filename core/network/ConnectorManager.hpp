@@ -22,6 +22,7 @@ public:
     void reportError(Socket socket, ErrorInfo &&error) override;
     void reportEvent(Socket socket, ConnectorEvent event) override;
     void reportState(Socket socket, ConnectorState state) override;
+    void reportData(Socket socket, std::shared_ptr<Packet> packet) override;
 private:
     ConnectorManager();
     

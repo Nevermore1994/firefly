@@ -61,7 +61,7 @@ struct SocketAddressInfo{
     SocketAddressInfo();
     SocketAddressInfo(IPAddressInfo info, Port port);
     uint32_t size() const noexcept;
-    SocketAddr* addr() noexcept;
+    SocketAddr addr() const noexcept;
 public:
     inline bool isValid() const noexcept{
         return ipInfo.type != IPType::Unknown;
