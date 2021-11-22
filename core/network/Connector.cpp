@@ -35,7 +35,11 @@ bool Connector::initData() noexcept {
     
     //disable reuse addr
     int32_t on = 0;
+#ifdef __linux__
+    auto res = setSocketConfig(SOL_SOCKET, MSG_NOSIGNAL, reinterpret_cast<const char*>(&on), sizeof(on));
+#else
     auto res = setSocketConfig(SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<const char*>(&on), sizeof(on));
+#endif
     if(!res){
         loge("set socket disable reuse addr, error %s", strerror(errno));
         return false;

@@ -41,7 +41,9 @@ SocketAddressInfo::SocketAddressInfo(IPAddressInfo info, Port port)
         address.sin_addr = ipInfo.getIPv4();
         address.sin_family = AF_INET;
         address.sin_port = htons(port);
+#ifdef __APPLE__
         address.sin_len = sizeof(SocketAddress);
+#endif
         socketInfo = address;
     } else if(info.type == IPType::IPv6){
         SocketAddressv6 address;
@@ -50,7 +52,9 @@ SocketAddressInfo::SocketAddressInfo(IPAddressInfo info, Port port)
         address.sin6_flowinfo = 0;
         address.sin6_scope_id = ipInfo.scopeID;
         address.sin6_port = htons(port);
+#ifdef __APPLE__
         address.sin6_len = sizeof(SocketAddressv6);
+#endif
         socketInfo = address;
     }
 }
