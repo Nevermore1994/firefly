@@ -8,6 +8,7 @@
 #include "Type.hpp"
 #include "NetEngine.hpp"
 #include "PacketPool.hpp"
+#include "NetworkConfig.hpp"
 #include <cstdint>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -35,13 +36,14 @@ bool Connector::initData() noexcept {
     
     //disable reuse addr
     int32_t on = 0;
-#ifdef __linux__
+#ifdef linux
     auto res = setSocketConfig(SOL_SOCKET, MSG_NOSIGNAL, reinterpret_cast<const char*>(&on), sizeof(on));
 #else
     auto res = setSocketConfig(SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<const char*>(&on), sizeof(on));
 #endif
     if(!res){
         loge("set socket disable reuse addr, error %s", strerror(errno));
+        reportErrorInfo();
         return false;
     }
     
@@ -50,6 +52,7 @@ bool Connector::initData() noexcept {
     res = setSocketConfig(SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<const char*>(&on), sizeof(on));
     if(!res){
         loge("set socket disable no SIGPIPE, error %s", strerror(errno));
+        reportErrorInfo();
         return false;
     }
     
@@ -58,6 +61,7 @@ bool Connector::initData() noexcept {
     res = fcntl(socket_, F_SETFL, flag) == 0 ;
     if(!res){
         loge("set socket no block error %s", strerror(errno));
+        reportErrorInfo();
         return false;
     }
     
@@ -71,7 +75,7 @@ bool Connector::initData() noexcept {
 }
 
 void Connector::setDelay(bool delay) {
-    int32_t flag = delay ? 1 : 0;
+    auto flag = delay ? 1 : 0;
     isDelay_ = delay;
     auto res = setSocketConfig(IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<const char*>(&flag), sizeof(flag));
     if(!res){
@@ -93,7 +97,7 @@ bool Connector::isWriteable() const noexcept {
     return (flag & kWriteableFlag) > 0;
 }
 
-void Connector::onError(ErrorInfo&& info) {
+void Connector::onError(ErrorInfo&& info) noexcept {
     setState(ConnectorState::Error);
     if(!manager_.expired()){
        auto manager = manager_.lock();
@@ -101,8 +105,59 @@ void Connector::onError(ErrorInfo&& info) {
     }
 }
 
-void Connector::onReceived() {
+void Connector::onReceived() noexcept {
     if(!isValid()){
+        return;
+    }
+    if(state_ == ConnectorState::Connecting){
+        connected();
+        return;
+    }
+    
+    auto res = 1;
+    uint8_t buffer[kReceiveSize];
+    auto bufferSize = sizeof(buffer);
+    if (info_->isTcpLink()){
+        while(res){
+            res = recv(socket_, buffer, bufferSize, 0);
+            if(res < 0) {
+                if(isIgnoredError()){
+                    //not error, continue next
+                } else {
+                    loge("tcp receive, error: %s", strerror(errno));
+                    reportErrorInfo();
+                }
+            } else if(res > 0){
+                logi("tcp socket %d, receive data len %d", socket_, res);
+                receiveBuffer_.append(buffer, res);
+                if(res < bufferSize || receiveBuffer_.length() >= kReceiveBufferSize){
+                    break;
+                }
+            }
+            //if res <= 0, will be exited this loop
+        }
+    } else if (info_->isUdpLink()) {
+        auto addr = info_->remoteIP.addr();
+        auto addrLength = info_->remoteIP.size();
+        while(res){
+            res = recvfrom(socket_, buffer, bufferSize, 0, &addr, &addrLength);
+            if(res < 0){
+                loge("udp receive, error: %s", strerror(errno));
+                reportErrorInfo();
+            } else if(res > 0){
+                logi("udp socket %d, receive data len %d", socket_, res);
+                //receiveBuffer_
+            }
+            //if res <= 0, will be exited this loop
+        }
+    }
+    postData();
+}
+
+void Connector::onSend() noexcept {
+    if(!isValid()){
+        //remove invalid socket
+        setEvent(ConnectorEvent::Remove);
         return;
     }
     if(state_ == ConnectorState::Connecting){
@@ -110,53 +165,38 @@ void Connector::onReceived() {
         return;
     }
     
-    int32_t res = 1;
-    uint8_t buffer[kReceiveSize];
-    uint32_t bufferSize = sizeof(buffer);
-    if (info_->isTcpLink()){
-        while(res){
-            res = recv(socket_, buffer, bufferSize, 0);
-            if(res < 0) {
-                if(errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN){
-                    //not error, continue next
-                } else {
-                    loge("tcp receive, error: %s", strerror(errno));
-                    reportErrorInfo();
-                }
-                break; //no block, no data, or error
-            } else if(res == 0) {
-                //remote socket shut down
-            } else {
-                logi("tcp socket %d, receive data len %d", socket_, res);
-                receiveBuffer_.append(buffer, (uint32_t)res);
-                if(res < bufferSize || receiveBuffer_.size() >= kReceiveBufferSize){
-                    break;
-                }
+    //post packet to send
+    auto addr = info_->remoteIP.addr();
+    {
+        auto res = 1;
+        std::unique_lock<std::mutex> lock(mutex_);
+        while(!sendPackets_.empty()){
+            if(!isValid()){
+                break;
             }
-        }
-    } else if (info_->isUdpLink()) {
-        SocketAddr addr = info_->remoteIP.addr();
-        socklen_t addrLength = info_->remoteIP.size();
-        while(res){
-            res = recvfrom(socket_, buffer, bufferSize, 0, &addr, &addrLength);
-            if(res < 0){
-                loge("udp receive, error: %s", strerror(errno));
+            auto packet = sendPackets_.front();
+            if(packet->isValid()){
+                if(info_->isTcpLink()){
+                    res = send(socket_, packet->front(), packet->size(), 0);
+                } else if(info_->isUdpLink()){
+                    res = sendto(socket_, packet->front(), 0, packet->size(), &addr, info_->remoteIP.size());
+                }
+#if NETWORK_LOG
+                logi("%s socket %d, send data:%d ", info_->isTcpLink() ? "tcp" : "udp", res);
+#endif
+            }
+            
+            if(!packet->isValid() || res >= packet->size()){
+                sendPackets_.pop_front();
+                PacketPool::shareInstance().releasePacket(packet);
+            } else if(res > 0){
+                packet->freed(res); //move packet position
+            } else if(res < 0 && !isIgnoredError()){
+                loge("%s socket %d, send error:%s ", info_->isTcpLink() ? "tcp" : "udp", strerror(errno));
                 reportErrorInfo();
                 break;
-            } else if(res > 0){
-                logi("udp socket %d, receive data len %d", socket_, res);
-                receiveBuffer_.append(buffer, res);
-            } else {
-                break;
             }
         }
-    }
-    postData();
-}
-
-void Connector::onSend() {
-    if(!isValid()){
-        return;
     }
 }
 
@@ -167,7 +207,7 @@ bool Connector::open(IPAddressInfo ip, Port port) noexcept {
 
 bool Connector::open(SocketAddressInfo ipInfo) noexcept {
     info_->remoteIP = ipInfo;
-    bool res = open();
+    auto res = open();
     if(!res){
         setState(ConnectorState::Error);
     }
@@ -178,7 +218,7 @@ bool Connector::open() noexcept {
     if(!info_->remoteIP.isValid()){
         return false;
     }
-    bool res = true;
+    auto res = true;
     res = initData();
     
     if(!res){
@@ -255,6 +295,13 @@ void Connector::close() noexcept {
     socket_ = kSocketInvalid;
 }
 
+void Connector::connected() noexcept {
+    setState(ConnectorState::Connected);
+#if NETWORK_LOG
+    logi("%s socket:%d connected.", info_->isTcpLink() ? "tcp": "udp", socket_);
+#endif
+}
+
 bool Connector::setSocketConfig(int32_t level, int32_t optName, const char *value, size_t size) const {
    return setsockopt(socket_, level, optName, value, size) == 0;
 }
@@ -287,7 +334,7 @@ void Connector::postData() noexcept {
         return;
     }
     if(!receiveBuffer_.empty()){
-        uint32_t length = receiveBuffer_.size();
+        auto length = receiveBuffer_.length();
         if(length <= 4){
             //data length is short
             return;
@@ -299,6 +346,10 @@ void Connector::postData() noexcept {
             manager->reportData(socket_, packet);
         }
     }
+}
+
+bool Connector::isIgnoredError() noexcept {
+    return errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN || errno == ENOBUFS;
 }
 
 

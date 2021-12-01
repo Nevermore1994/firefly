@@ -97,7 +97,7 @@ void NetEngine::process() noexcept {
     }
 }
 
-void NetEngine::add(Socket socket, std::shared_ptr<IConnector> connector) noexcept {
+void NetEngine::add(Socket socket, std::shared_ptr<Connector> connector) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     if(connector->isReadable()){
         readSet_.insert(socket);
@@ -133,26 +133,20 @@ void NetEngine::clear() noexcept {
 }
 
 void NetEngine::sendData(Socket socket) noexcept {
-    std::shared_ptr<IConnector> connector;
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        if(connectors_.count(socket) == 0){
-            return;
-        }
-        connector = connectors_.at(socket);
+    std::unique_lock<std::mutex> lock(mutex_);
+    if(connectors_.count(socket) == 0){
+        return;
     }
+    auto connector = connectors_.at(socket);
     connector->onSend();
 }
 
 void NetEngine::receiveData(Socket socket) noexcept {
-    std::shared_ptr<IConnector> connector;
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        if(connectors_.count(socket) == 0){
-            return;
-        }
-        connector = connectors_.at(socket);
+    std::unique_lock<std::mutex> lock(mutex_);
+    if(connectors_.count(socket) == 0){
+        return;
     }
+    auto connector = connectors_.at(socket);
     connector->onReceived();
 }
 
@@ -186,7 +180,7 @@ void NetEngine::checkAllSocket(const std::vector<Socket>& readSockets, const std
 }
 
 bool NetEngine::checkSocket(Socket socket) noexcept {
-    std::shared_ptr<IConnector> connector;
+    std::shared_ptr<Connector> connector;
     {
         std::unique_lock<std::mutex> lock(mutex_);
         if(connectors_.count(socket) == 0){

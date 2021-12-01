@@ -4,7 +4,7 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #pragma once
-#include "IConnector.hpp"
+#include "Connector.hpp"
 #include <unordered_map>
 
 namespace firefly::Network{
@@ -19,14 +19,16 @@ public:
 public:
     ~ConnectorManager();
     
-    void reportError(Socket socket, ErrorInfo &&error) override;
-    void reportEvent(Socket socket, ConnectorEvent event) override;
-    void reportState(Socket socket, ConnectorState state) override;
-    void reportData(Socket socket, std::shared_ptr<Packet> packet) override;
+    void reportError(Socket socket, ErrorInfo &&error) noexcept override;
+    void reportEvent(Socket socket, ConnectorEvent event) noexcept override;
+    void reportState(Socket socket, ConnectorState state) noexcept override;
+    void reportData(Socket socket, std::shared_ptr<Packet> packet) noexcept override;
+    void send(Socket socket) noexcept override;
+    void received(Socket socket) noexcept override;
 private:
     ConnectorManager();
-    
 private:
+    std::unordered_map<Socket, std::shared_ptr<Connector>> connectors_;
 };
 
 }

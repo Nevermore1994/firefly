@@ -5,7 +5,6 @@
 //
 #include "NetUtility.hpp"
 #include "Log.hpp"
-#include <regex>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -97,7 +96,6 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
     if (res == 0) {
         struct addrinfo* info = result;
         std::vector<struct addrinfo*> addrInfos;
-        char m_ipaddr[16];
         
         while(info) {
             if(info->ai_family == PF_INET || info->ai_family == PF_INET6 || info->ai_family == PF_UNSPEC){

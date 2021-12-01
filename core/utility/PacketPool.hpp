@@ -56,7 +56,7 @@ public:
             packet = pool_[typeValue].front();
             pool_[typeValue].pop_front();
         }
-        memset(packet->buffer.get(), 0, packet->size);
+        memset(packet->buffer.get(), 0, packet->capacity);
         memcpy(packet->buffer.get(), data, len);
         packet->length = len;
         return packet;

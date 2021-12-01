@@ -8,125 +8,93 @@
 #include "NoCopyable.hpp"
 #include <cstdint>
 #include <mutex>
-#include <array>
+#include <vector>
+#include <atomic>
 
 namespace firefly{
 
-uint32_t  kMemoryFactor = 2;
-
-template<typename T, uint32_t PresetBufferSize>
+template<typename T>
 class Buffer:public NoCopyable{
 public:
     Buffer();
     ~Buffer() = default;
 public:
-    void append(T* data, uint32_t size) noexcept;
+    void append(const T* data, uint32_t size) noexcept;
     void reset() noexcept;
     uint32_t read(T* data, uint32_t size) noexcept;
-    bool empty() const noexcept;
 public:
+    [[maybe_unused]]
     inline uint32_t readPosition() const noexcept{
         return readPosition_;
     }
     
+    [[maybe_unused]]
     inline uint32_t writePosition() const noexcept{
         return writePosition_;
     }
     
-    inline uint32_t capacity() const noexcept{
-        return capacity_;
-    }
-    
-    inline uint32_t size() const noexcept{
+    [[maybe_unused]]
+    inline uint32_t length() const noexcept{
         return writePosition_ - readPosition_;
     }
     
-    inline T* data() noexcept{
-        return data_.get();
-    }
-    
+    [[maybe_unused]]
     inline T* front() noexcept{
-        assert(size() == 0);
-        return data_.get() + readPosition_ + 1;
+        std::unique_lock<std::mutex> lock(mutex_);
+        return data_->data() + readPosition_;
     }
     
-    inline T* back() noexcept{
-        return data_.get() + writePosition_;
+    [[maybe_unused]]
+    inline bool empty() noexcept{
+        std::unique_lock<std::mutex> lock(mutex_);
+        return data_->empty();
     }
-    
 private:
-    void alloc() noexcept;
-private:
-    std::unique_ptr<T[]> data_;
-    uint32_t capacity_ = PresetBufferSize;
-    uint32_t readPosition_ = 0;
-    uint32_t writePosition_ = 0;
+    std::unique_ptr<std::vector<T>> data_;
+    std::atomic<uint32_t> readPosition_  = 0;
+    std::atomic<uint32_t> writePosition_ = 0;
     std::mutex mutex_;
 };
 
-template<typename T, uint32_t PresetBufferSize>
-Buffer<T, PresetBufferSize>::Buffer()
-    :data_(std::make_unique<T[]>(PresetBufferSize)){
+template<typename T>
+Buffer<T>::Buffer()
+    :data_(std::make_unique<std::vector<T>>()){
     
 }
 
-template<typename T, uint32_t PresetBufferSize>
-void Buffer<T, PresetBufferSize>::append(T* data, uint32_t size) noexcept {
-    uint32_t surplusWriteSize = capacity_ - writePosition_;
-    if(surplusWriteSize < size){
-        alloc();
-    }
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        memmove(data_.get(), data, size);
-    }
+template<typename T>
+void Buffer<T>::append(const T* data, uint32_t size) noexcept {
+    std::unique_lock<std::mutex> lock(mutex_);
+    data_->insert(data_->end(), data, data + size);
 }
 
-template<typename T, uint32_t PresetBufferSize>
-void Buffer<T, PresetBufferSize>::reset() noexcept {
+template<typename T>
+void Buffer<T>::reset() noexcept {
     if(data_){
         std::unique_lock<std::mutex> lock(mutex_);
-        if(capacity_ > PresetBufferSize){
-            data_.reset(std::make_unique<T[]>(PresetBufferSize));
-        }
-        capacity_ = PresetBufferSize;
+        data_->clear();
         writePosition_ = 0;
         readPosition_ = 0;
     }
 }
 
-template<typename T, uint32_t PresetBufferSize>
-uint32_t Buffer<T, PresetBufferSize>::read(T *data, uint32_t size) noexcept {
-    uint32_t surplusSize = this->size();
+template<typename T>
+uint32_t Buffer<T>::read(T *data, uint32_t size) noexcept {
+    uint32_t dataLength = length();
     uint32_t readSize = 0;
-    if(surplusSize == 0){
+    if(dataLength == 0){
         return readSize;
-    } else if(surplusSize >= size){
+    } else if(dataLength >= size){
         readSize = size;
     } else {
-        readSize = surplusSize;
+        readSize = dataLength;
     }
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        memmove(data, data_.get() + readSize, size);
+        memmove(data, data_->data() + readPosition_, readSize);
         readPosition_ += readSize;
     }
     return readSize;
-}
-
-template<typename T, uint32_t PresetBufferSize>
-void Buffer<T, PresetBufferSize>::alloc() noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
-    decltype(data_) temp = std::make_unique<T[]>(capacity_ * kMemoryFactor);
-    auto surplusSize = size();
-    memmove(temp.get(), data_.get() + readPosition_, surplusSize);
-    writePosition_ = surplusSize;
-    data_ = std::move(temp);
-}
-
-template<typename T, uint32_t PresetBufferSize>
-bool Buffer<T, PresetBufferSize>::empty() const noexcept {
-    return size() == 0;
 }
 
 }
