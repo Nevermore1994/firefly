@@ -15,6 +15,10 @@
 #include <netinet/tcp.h>
 #include <unistd.h>
 
+#ifndef __APPLE__
+#include <signal.h>
+#endif
+
 using namespace firefly::Network;
 
 Connector::Connector(std::unique_ptr<ConnectorInfo> info)
@@ -36,11 +40,7 @@ bool Connector::initData() noexcept {
     
     //disable reuse addr
     int32_t on = 0;
-#ifdef __APPLE__
-    auto res = setSocketConfig(SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<const char*>(&on), sizeof(on));
-#else
-    auto res = setSocketConfig(SOL_SOCKET, MSG_NOSIGNAL, reinterpret_cast<const char*>(&on), sizeof(on));
-#endif
+    auto res = setSocketConfig(SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<const char*>(&on), sizeof(on));
     if(!res){
         loge("set socket disable reuse addr, error %s", strerror(errno));
         reportErrorInfo();
@@ -49,7 +49,12 @@ bool Connector::initData() noexcept {
     
     //disable SIGPIPE
     on = 1;
+#ifdef __APPLE__
     res = setSocketConfig(SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<const char*>(&on), sizeof(on));
+#else
+    signal(SIGPIPE, SIG_IGN);
+    res = 1;
+#endif
     if(!res){
         loge("set socket disable no SIGPIPE, error %s", strerror(errno));
         reportErrorInfo();
@@ -114,7 +119,7 @@ void Connector::onReceived() noexcept {
         return;
     }
     
-    auto res = 1;
+    auto res = 1l;
     uint8_t buffer[kReceiveSize];
     auto bufferSize = sizeof(buffer);
     if (info_->isTcpLink()){
@@ -168,7 +173,7 @@ void Connector::onSend() noexcept {
     //post packet to send
     auto addr = info_->remoteIP.addr();
     {
-        auto res = 1;
+        auto res = 1l;
         std::unique_lock<std::mutex> lock(mutex_);
         while(!sendPackets_.empty()){
             if(!isValid()){
