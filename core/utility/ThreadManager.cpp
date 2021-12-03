@@ -64,7 +64,7 @@ void ThreadManager::reportRunInfo() noexcept {
         }
         auto thread = t.lock();
         TimeStamp interval = (now - thread->getLastRunTimeStamp());
-        if(thread->isRunning() && interval >= kMaxTimeInterval){
+        if(thread->isRunning() && interval >= kMaxThreadBlockTimeInterval){
             loge("ThreadManager report [%s] is blocking.", thread->getName().data());
         }
     }

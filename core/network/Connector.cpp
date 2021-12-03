@@ -119,42 +119,10 @@ void Connector::onReceived() noexcept {
         return;
     }
     
-    auto res = 1l;
-    uint8_t buffer[kReceiveSize];
-    auto bufferSize = sizeof(buffer);
     if (info_->isTcpLink()){
-        while(res){
-            res = recv(socket_, buffer, bufferSize, 0);
-            if(res < 0) {
-                if(isIgnoredError()){
-                    //not error, continue next
-                } else {
-                    loge("tcp receive, error: %s", strerror(errno));
-                    reportErrorInfo();
-                }
-            } else if(res > 0){
-                logi("tcp socket %d, receive data len %d", socket_, res);
-                receiveBuffer_.append(buffer, res);
-                if(res < bufferSize || receiveBuffer_.length() >= kReceiveBufferSize){
-                    break;
-                }
-            }
-            //if res <= 0, will be exited this loop
-        }
+        receiveTcpData();
     } else if (info_->isUdpLink()) {
-        auto addr = info_->remoteIP.addr();
-        auto addrLength = info_->remoteIP.size();
-        while(res){
-            res = recvfrom(socket_, buffer, bufferSize, 0, &addr, &addrLength);
-            if(res < 0){
-                loge("udp receive, error: %s", strerror(errno));
-                reportErrorInfo();
-            } else if(res > 0){
-                logi("udp socket %d, receive data len %d", socket_, res);
-                //receiveBuffer_
-            }
-            //if res <= 0, will be exited this loop
-        }
+        receiveUdpData();
     }
     postData();
 }
@@ -349,12 +317,74 @@ void Connector::postData() noexcept {
         auto manager = manager_.lock();
         if(manager){
             manager->reportData(socket_, packet);
+            receiveBuffer_.reset();
         }
     }
+}
+
+bool Connector::receiveTcpData() noexcept {
+    auto res = 1l;
+    uint8_t buffer[kReceiveSize];
+    auto bufferSize = sizeof(buffer);
+    auto receiveSize = 0ul;
+    while(res){
+        res = recv(socket_, buffer, bufferSize, 0);
+        if(res < 0) {
+            if(isIgnoredError()){
+                //not error, continue next
+            } else {
+                loge("tcp receive, error: %s", strerror(errno));
+                reportErrorInfo();
+            }
+        } else if(res > 0){
+            logi("tcp socket %d, receive data len %d", socket_, res);
+            receiveBuffer_.append(buffer, res);
+            receiveSize += res;
+            if(res < bufferSize || receiveBuffer_.length() >= kReceiveBufferSize){
+                break;
+            }
+        }
+        //if res <= 0, will be exited this loop
+    }
+    receiveSize_ += receiveSize;
+#if NETWORK_LOG
+    logi("receiveTcpData %lu", receiveSize);
+#endif
+    return receiveSize == 0;
+}
+
+bool Connector::receiveUdpData() noexcept {
+    auto addr = info_->remoteIP.addr();
+    auto addrLength = info_->remoteIP.size();
+    auto res = 1l;
+    auto receiveSize = 0ul;
+    uint8_t buffer[kReceiveSize];
+    auto bufferSize = sizeof(buffer);
+    while(res){
+        res = recvfrom(socket_, buffer, bufferSize, 0, &addr, &addrLength);
+        if(res < 0){
+            loge("udp receive, error: %s", strerror(errno));
+            reportErrorInfo();
+        } else if(res > 0){
+            logi("udp socket %d, receive data len %d", socket_, res);
+            receiveSize += res;
+            receiveBuffer_.append(buffer, res);
+            if(res < bufferSize || receiveBuffer_.length() >= kReceiveBufferSize){
+                break;
+            }
+        }
+        //if res <= 0, will be exited this loop
+    }
+    receiveSize_ += receiveSize;
+#if NETWORK_LOG
+    logi("receiveUdpData %lu", receiveSize);
+#endif
+    return receiveSize == 0;
 }
 
 bool Connector::isIgnoredError() noexcept {
     return errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN || errno == ENOBUFS;
 }
+
 
 

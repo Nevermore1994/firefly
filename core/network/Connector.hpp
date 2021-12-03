@@ -108,6 +108,8 @@ private:
     void setEvent(ConnectorEvent event) noexcept;
     void reportErrorInfo() noexcept;
     void postData() noexcept;
+    bool receiveTcpData() noexcept;
+    bool receiveUdpData() noexcept;
     static bool isIgnoredError() noexcept;
 private:
     std::unique_ptr<ConnectorInfo> info_;
@@ -119,6 +121,11 @@ private:
     bool isDelay_;
     std::mutex mutex_;
     std::weak_ptr<IConnectorHandler> manager_;
+    
+    //info
+private:
+    uint64_t receiveSize_ = 0ull;
+    uint64_t sendSize_ = 0ull;
 };
 
 }
