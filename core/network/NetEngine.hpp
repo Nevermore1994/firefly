@@ -31,7 +31,7 @@ public:
 private:
     NetEngine();
 public:
-    void add(Socket socket, std::shared_ptr<Connector> connector) noexcept;
+    void add(Socket socket, ConnectorType type) noexcept;
     void remove(Socket socket) noexcept;
     void clear() noexcept;
     void stop() noexcept;
@@ -44,7 +44,8 @@ private:
 private:
     std::unordered_set<Socket> readSet_;
     std::unordered_set<Socket> writeSet_;
-    std::unordered_map<Socket, std::shared_ptr<Connector>> connectors_;
+    std::unordered_map<Socket, ConnectorType> sockets_;
+    std::weak_ptr<IConnectorManager> connectorHandler_;
     std::mutex mutex_;
     std::atomic<bool> isExit_;
     std::shared_ptr<Thread> worker_;

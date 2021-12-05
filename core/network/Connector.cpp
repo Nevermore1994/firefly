@@ -93,20 +93,18 @@ bool Connector::isActive() const noexcept {
 }
 
 bool Connector::isReadable() const noexcept {
-    auto flag = static_cast<int32_t>(info_->connectorType);
-    return (flag & kReadableFlag) > 0;
+    return isConnectorReadable(info_->connectorType);
 }
 
 bool Connector::isWriteable() const noexcept {
-    auto flag = static_cast<int32_t>(info_->connectorType);
-    return (flag & kWriteableFlag) > 0;
+    return isConnectorWriteable(info_->connectorType);
 }
 
 void Connector::onError(ErrorInfo&& info) noexcept {
     setState(ConnectorState::Error);
-    if(!manager_.expired()){
-       auto manager = manager_.lock();
-       manager->reportError(socket_, std::move(info));
+    if(!handler_.expired()){
+       auto handler = handler_.lock();
+        handler->reportError(std::move(info));
     }
 }
 
@@ -281,9 +279,9 @@ bool Connector::setSocketConfig(int32_t level, int32_t optName, const char *valu
 
 void Connector::setState(ConnectorState state) noexcept {
     state_ = state;
-    if(!manager_.expired()){
-        auto manager = manager_.lock();
-        manager->reportState(socket_, state);
+    if(!handler_.expired()){
+        auto handler = handler_.lock();
+        handler->reportState(state);
     }
 }
 
@@ -314,9 +312,9 @@ void Connector::postData() noexcept {
         }
         
         auto packet = PacketPool::shareInstance().newPacket(receiveBuffer_.front(), length);
-        auto manager = manager_.lock();
-        if(manager){
-            manager->reportData(socket_, packet);
+        auto handler = handler_.lock();
+        if(handler){
+            handler->reportData(packet);
             receiveBuffer_.reset();
         }
     }

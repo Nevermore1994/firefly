@@ -97,60 +97,58 @@ void NetEngine::process() noexcept {
     }
 }
 
-void NetEngine::add(Socket socket, std::shared_ptr<Connector> connector) noexcept {
+void NetEngine::add(Socket socket, ConnectorType type) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
-    if(connector->isReadable()){
+    if(isConnectorReadable(type)){
         readSet_.insert(socket);
     }
     
-    if(connector->isWriteable()){
+    if(isConnectorWriteable(type)){
         writeSet_.insert(socket);
     }
-    connectors_.insert(std::make_pair(socket, std::move(connector)));
+    sockets_.insert(std::make_pair(socket, type));
 }
 
 void NetEngine::remove(Socket socket) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
-    if(connectors_.count(socket) == 0){
-        return;
-    }
-    auto connector = connectors_.at(socket);
-    if(connector->isReadable()){
-        readSet_.erase(socket);
-    }
-    
-    if(connector->isWriteable()){
-        writeSet_.erase(socket);
-    }
-    connectors_.erase(socket);
+    readSet_.erase(socket);
+    writeSet_.erase(socket);
+    sockets_.erase(socket);
 }
 
 void NetEngine::clear() noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     readSet_.clear();
     writeSet_.clear();
-    connectors_.clear();
+    sockets_.clear();
 }
 
 void NetEngine::sendData(Socket socket) noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
-    if(connectors_.count(socket) == 0){
-        return;
+    if(connectorHandler_.expired()){
+        loge("send data error, connector expired.");
     }
-    auto connector = connectors_.at(socket);
-    connector->onSend();
+    auto handler = connectorHandler_.lock();
+    if(handler){
+        handler->send(socket);
+    }
 }
 
 void NetEngine::receiveData(Socket socket) noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
-    if(connectors_.count(socket) == 0){
-        return;
+    if(connectorHandler_.expired()){
+        loge("receive data error, connector expired.");
     }
-    auto connector = connectors_.at(socket);
-    connector->onReceived();
+    auto handler = connectorHandler_.lock();
+    if(handler){
+        handler->received(socket);
+    }
 }
 
 void NetEngine::checkAllSocket(const std::vector<Socket>& readSockets, const std::vector<Socket>& writeSockets) noexcept {
+    if(connectorHandler_.expired()){
+        loge("check socket error, connector expired.");
+        return;
+    }
+    auto handler = connectorHandler_.lock();
     std::vector<Socket> invalidSockets;
     for(auto socket : readSockets){
         if(!checkSocket(socket)){
@@ -167,36 +165,25 @@ void NetEngine::checkAllSocket(const std::vector<Socket>& readSockets, const std
         for(auto socket : invalidSockets){
             readSet_.erase(socket);
             writeSet_.erase(socket);
-            auto it = connectors_.find(socket);
-            if(it != connectors_.end()){
-                auto connector = it->second;
-                connectors_.erase(socket);
-                ErrorInfo errorInfo;
-                errorInfo.errorNumber = EBADF;
-                connector->onError(std::move(errorInfo));
-            }
+            sockets_.erase(socket);
+            ErrorInfo errorInfo;
+            errorInfo.errorNumber = EBADF;
+            handler->onError(socket, std::move(errorInfo));
         }
     }
 }
 
 bool NetEngine::checkSocket(Socket socket) noexcept {
-    std::shared_ptr<Connector> connector;
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        if(connectors_.count(socket) == 0){
-            return false;
-        }
-        connector = connectors_.at(socket);
-    }
     fd_set fdSet;
     FD_ZERO(&fdSet);
     FD_SET(socket, &fdSet);
     
+    auto type = sockets_[socket];
     struct timeval timeout{};
     timeout.tv_sec = 0;
     timeout.tv_usec = 0;
     
-    auto res = select(socket + 1, connector->isReadable() ? &fdSet : nullptr, connector->isWriteable() ? &fdSet : nullptr,
+    auto res = select(socket + 1, isConnectorReadable(type) ? &fdSet : nullptr, isConnectorWriteable(type) ? &fdSet : nullptr,
                       nullptr, &timeout);
     if(res > 0 || errno != EBADF){
         return true;

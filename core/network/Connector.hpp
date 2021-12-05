@@ -120,8 +120,8 @@ private:
     std::list<std::shared_ptr<Packet>> sendPackets_;
     bool isDelay_;
     std::mutex mutex_;
-    std::weak_ptr<IConnectorHandler> manager_;
-    
+    std::weak_ptr<IConnectorManager> manager_;
+    std::weak_ptr<IConnectorHandler> handler_;
     //info
 private:
     uint64_t receiveSize_ = 0ull;

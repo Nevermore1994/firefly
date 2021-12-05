@@ -34,20 +34,36 @@ enum class ConnectorEvent{
     Remove,
 };
 
-constexpr const int32_t kReadableFlag = 0x0001;
-constexpr const int32_t kWriteableFlag = 0x0010;
+constexpr const int32_t kReadableFlag = static_cast<int32_t>(ConnectorType::Read);
+constexpr const int32_t kWriteableFlag = static_cast<int32_t>(ConnectorType::Write);
 using ConnectorID = uint64_t;
 
-class IConnectorHandler{
+inline bool isConnectorReadable(ConnectorType type){
+    auto flag = static_cast<int32_t>(type);
+    return (flag & kReadableFlag) > 0;
+}
+
+inline bool isConnectorWriteable(ConnectorType type){
+    auto flag = static_cast<int32_t>(type);
+    return (flag & kWriteableFlag) > 0;
+}
+
+class IConnectorManager{
 public:
-    virtual void reportState(Socket socket, ConnectorState state) noexcept = 0;
     virtual void reportEvent(Socket socket, ConnectorEvent event) noexcept = 0;
-    virtual void reportError(Socket socket, ErrorInfo&& error) noexcept = 0;
-    virtual void reportData(Socket socket, std::shared_ptr<Packet> packet) noexcept = 0;
     
     virtual void send(Socket socket) noexcept = 0;
     virtual void received(Socket socket) noexcept = 0;
+    virtual void onError(Socket socket, ErrorInfo&& info) noexcept = 0;
+    virtual ~IConnectorManager() = default;
 };
 
+class IConnectorHandler{
+public:
+    virtual void reportState(ConnectorState state) noexcept = 0;
+    virtual void reportError(ErrorInfo&& error) noexcept = 0;
+    virtual void reportData(std::shared_ptr<Packet> packet) noexcept = 0;
+    virtual ~IConnectorHandler() = default;
+};
 
 }
