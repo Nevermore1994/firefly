@@ -191,3 +191,7 @@ bool NetEngine::checkSocket(Socket socket) noexcept {
     return false;
 }
 
+void NetEngine::setHandler(std::weak_ptr<IConnectorManager> handler) noexcept{
+    connectorHandler_ = std::move(handler);
+}
+

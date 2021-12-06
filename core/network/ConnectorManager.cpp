@@ -10,11 +10,11 @@
 using namespace firefly::Network;
 
 ConnectorManager::~ConnectorManager() {
-    
+    removeAllConnector();
 }
 
 ConnectorManager::ConnectorManager() {
-
+    NetEngine::shareInstance().setHandler(weak_from_this());
 }
 
 void ConnectorManager::reportEvent(Socket socket,ConnectorEvent event) noexcept {
@@ -68,4 +68,9 @@ void ConnectorManager::removeConnector(const std::shared_ptr<Connector>& connect
 void ConnectorManager::removeConnector(Socket socket) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     connectors_.erase(socket);
+}
+
+void ConnectorManager::removeAllConnector() noexcept {
+    std::unique_lock<std::mutex> lock(mutex_);
+    connectors_.clear();
 }

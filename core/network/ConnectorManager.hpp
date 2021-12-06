@@ -10,15 +10,20 @@
 
 namespace firefly::Network{
 
-class ConnectorManager: public IConnectorManager{
+class ConnectorManager: public IConnectorManager, std::enable_shared_from_this<ConnectorManager>{
 public:
     static inline ConnectorManager& shareInstance() {
-        static ConnectorManager instance;
-        return instance;
+        static std::once_flag flag;
+        static std::shared_ptr<ConnectorManager> manager;
+        std::call_once(flag, [](){
+             manager = std::make_shared<ConnectorManager>();
+        });
+        return *manager;
     }
 
 public:
-    ~ConnectorManager();
+    ~ConnectorManager() override;
+    ConnectorManager();
     
     void reportEvent(Socket socket, ConnectorEvent event) noexcept override;
     void send(Socket socket) noexcept override;
@@ -29,8 +34,7 @@ public:
     std::shared_ptr<Connector> newConnector(std::unique_ptr<ConnectorInfo> info) noexcept;
     void removeConnector(const std::shared_ptr<Connector>& connector)noexcept;
     void removeConnector(Socket socket)noexcept;
-private:
-    ConnectorManager();
+    void removeAllConnector() noexcept;
 private:
     std::unordered_map<Socket, std::shared_ptr<Connector>> connectors_;
     std::mutex mutex_;

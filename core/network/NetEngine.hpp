@@ -11,7 +11,7 @@
 #include <memory>
 #include "Connector.hpp"
 #include "Thread.hpp"
-#include "IPAddress.hpp"
+#include "NetworkType.hpp"
 #include "NoCopyable.hpp"
 
 namespace firefly::Network {
@@ -35,6 +35,7 @@ public:
     void remove(Socket socket) noexcept;
     void clear() noexcept;
     void stop() noexcept;
+    void setHandler(std::weak_ptr<IConnectorManager> handler) noexcept;
 private:
     void process() noexcept;
     void checkAllSocket(const std::vector<Socket>& readSockets, const std::vector<Socket>& writeSockets) noexcept;

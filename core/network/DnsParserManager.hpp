@@ -12,7 +12,7 @@
 #include <memory>
 #include <future>
 #include "Thread.hpp"
-#include "IPAddress.hpp"
+#include "NetworkType.hpp"
 
 namespace firefly::Network{
 

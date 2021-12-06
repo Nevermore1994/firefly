@@ -8,7 +8,7 @@
 
 #include <cstdint>
 #include "NoCopyable.hpp"
-#include "IPAddress.hpp"
+#include "NetworkType.hpp"
 #include "Type.hpp"
 #include "Packet.hpp"
 

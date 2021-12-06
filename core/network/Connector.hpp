@@ -5,7 +5,7 @@
 //
 #pragma once
 #include "ConnectorType.hpp"
-#include "IPAddress.hpp"
+#include "NetworkType.hpp"
 #include "Utility.hpp"
 #include "Packet.hpp"
 #include "Buffer.hpp"
