@@ -5,10 +5,19 @@
 //
 #pragma once
 #include <cstdint>
+#include <memory>
 #include "NetworkType.hpp"
 
 namespace firefly::Network
 {
+
+class ILinkHandler
+{
+public:
+    ILinkHandler() noexcept = default;
+    virtual ~ILinkHandler() = default;
+};
+
 
 class ILink
 {
@@ -21,15 +30,8 @@ public:
     virtual void onError() noexcept = 0;
     virtual void onDataReceived(const char* data, uint32_t size, uint64_t receivedTimeStamp) noexcept = 0;
     virtual LinkType linkType() noexcept = 0;
+    virtual void setDataHandler(std::weak_ptr<ILinkHandler> handler) noexcept = 0;
 };
-
-class ILinkHandler
-{
-public:
-    ILinkHandler() noexcept = default;
-    virtual ~ILinkHandler() = default;
-};
-
 
 } // namespace firefly
 
