@@ -14,22 +14,18 @@ namespace firefly::Network
 class ILinkHandler
 {
 public:
-    ILinkHandler() noexcept = default;
     virtual ~ILinkHandler() = default;
+    virtual void onConnected() noexcept = 0;
+    virtual void onError() noexcept = 0;
+    virtual void onDataReceived(const char* data, uint32_t size, uint64_t receivedTimeStamp) noexcept = 0;
 };
 
 
 class ILink
 {
 public:
-    ILink() = default;
-
-public:
     virtual ~ILink() noexcept = default;
-    virtual void onConnected() noexcept = 0;
-    virtual void onError() noexcept = 0;
-    virtual void onDataReceived(const char* data, uint32_t size, uint64_t receivedTimeStamp) noexcept = 0;
-    virtual LinkType linkType() noexcept = 0;
+    virtual LinkType linkType() const noexcept = 0;
     virtual void setDataHandler(std::weak_ptr<ILinkHandler> handler) noexcept = 0;
 };
 

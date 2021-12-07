@@ -14,7 +14,7 @@ using namespace firefly;
 using namespace firefly::Network;
 
 DnsParserRequest::DnsParserRequest(DnsHostInfo&& i, DnsParserCallBack c)
-    :info(i)
+    :info(std::forward<DnsHostInfo>(i))
     ,callBack(std::move(c)){
     
 }
@@ -73,7 +73,7 @@ bool DnsParserManager::parseHost(std::string&& host, IPAddressInfo& ip) noexcept
 }
 
 void DnsParserManager::parseHost(DnsParserRequest&& info) noexcept {
-    addRequest(std::move(info));
+    addRequest(std::forward<DnsParserRequest>(info));
 }
 
 std::string DnsParserManager::getMyHost() noexcept {

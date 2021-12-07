@@ -1,6 +1,6 @@
 //
 // Created by Nevermore on 2021/11/3.
-// firefly ConnectorManager
+// firefly ConnectorFactory
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #include "ConnectorManager.hpp"
@@ -9,15 +9,15 @@
 
 using namespace firefly::Network;
 
-ConnectorManager::~ConnectorManager() {
+ConnectorFactory::~ConnectorFactory() {
     removeAllConnector();
 }
 
-ConnectorManager::ConnectorManager() {
+ConnectorFactory::ConnectorFactory() {
     NetEngine::shareInstance().setHandler(weak_from_this());
 }
 
-void ConnectorManager::reportEvent(Socket socket,ConnectorEvent event) noexcept {
+void ConnectorFactory::reportEvent(Socket socket, ConnectorEvent event) noexcept {
     if(connectors_.count(socket) == 0){
         loge("error, socket is invalid. %d", socket);
         return;
@@ -30,28 +30,28 @@ void ConnectorManager::reportEvent(Socket socket,ConnectorEvent event) noexcept 
     }
 }
 
-void ConnectorManager::send(Socket socket) noexcept {
+void ConnectorFactory::send(Socket socket) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     if(connectors_.count(socket)){
         connectors_[socket]->onSend();
     }
 }
 
-void ConnectorManager::received(Socket socket) noexcept {
+void ConnectorFactory::received(Socket socket) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     if(connectors_.count(socket)){
         connectors_[socket]->onReceived();
     }
 }
 
-void ConnectorManager::onError(Socket socket, ErrorInfo&& info) noexcept {
+void ConnectorFactory::onError(Socket socket, ErrorInfo&& info) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     if(connectors_.count(socket)){
         connectors_[socket]->onError(std::move(info));
     }
 }
 
-std::shared_ptr<Connector> ConnectorManager::newConnector(std::unique_ptr<ConnectorInfo> info) noexcept {
+std::shared_ptr<Connector> ConnectorFactory::newConnector(std::unique_ptr<ConnectorInfo> info) noexcept {
     auto connector = std::make_shared<Connector>(std::move(info));
     {
         std::unique_lock<std::mutex> lock(mutex_);
@@ -60,17 +60,17 @@ std::shared_ptr<Connector> ConnectorManager::newConnector(std::unique_ptr<Connec
     return connector;
 }
 
-void ConnectorManager::removeConnector(const std::shared_ptr<Connector>& connector) noexcept{
+void ConnectorFactory::removeConnector(const std::shared_ptr<Connector>& connector) noexcept{
     std::unique_lock<std::mutex> lock(mutex_);
     connectors_.erase(connector->getSocket());
 }
 
-void ConnectorManager::removeConnector(Socket socket) noexcept {
+void ConnectorFactory::removeConnector(Socket socket) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     connectors_.erase(socket);
 }
 
-void ConnectorManager::removeAllConnector() noexcept {
+void ConnectorFactory::removeAllConnector() noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     connectors_.clear();
 }

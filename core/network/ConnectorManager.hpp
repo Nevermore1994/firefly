@@ -1,6 +1,6 @@
 //
 // Created by Nevermore on 2021/11/3.
-// firefly ConnectorManager
+// firefly ConnectorFactory
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #pragma once
@@ -10,20 +10,12 @@
 
 namespace firefly::Network{
 
-class ConnectorManager: public IConnectorManager, std::enable_shared_from_this<ConnectorManager>{
+class ConnectorFactory: public IConnectorManager, std::enable_shared_from_this<ConnectorFactory>{
 public:
-    static inline ConnectorManager& shareInstance() {
-        static std::once_flag flag;
-        static std::shared_ptr<ConnectorManager> manager;
-        std::call_once(flag, [](){
-             manager = std::make_shared<ConnectorManager>();
-        });
-        return *manager;
-    }
-
+    friend class ConnectorManager;
 public:
-    ~ConnectorManager() override;
-    ConnectorManager();
+    ~ConnectorFactory() override;
+    ConnectorFactory();
     
     void reportEvent(Socket socket, ConnectorEvent event) noexcept override;
     void send(Socket socket) noexcept override;
@@ -38,6 +30,18 @@ public:
 private:
     std::unordered_map<Socket, std::shared_ptr<Connector>> connectors_;
     std::mutex mutex_;
+};
+
+class ConnectorManager{
+public:
+    static ConnectorFactory& shareInstance() noexcept{
+        static std::once_flag flag;
+        static std::shared_ptr<ConnectorFactory> factory;
+        std::call_once(flag, [](){
+            factory = std::make_shared<ConnectorFactory>();
+        });
+        return *factory;
+    }
 };
 
 }

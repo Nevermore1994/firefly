@@ -19,6 +19,12 @@ namespace firefly::Network{
 struct DnsHostInfo{
     std::string uuid;
     std::string host;
+    
+    DnsHostInfo() = default;
+    explicit DnsHostInfo(std::string&& h)
+        :host(std::forward<std::string>(h)){
+        
+    }
 };
 
 using DnsParserCallBack = std::function<void(DnsHostInfo,IPAddressInfo)>;

@@ -4,7 +4,7 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #pragma once
-#include "ConnectorType.hpp"
+#include "IConnectorManager.hpp"
 #include "NetworkType.hpp"
 #include "Utility.hpp"
 #include "Packet.hpp"
@@ -54,6 +54,7 @@ public:
 class Connector{
 public:
     explicit Connector(std::unique_ptr<ConnectorInfo> info);
+    Connector(std::unique_ptr<ConnectorInfo> info, std::weak_ptr<IConnectorHandler> handler);
     ~Connector() = default;
 
 public:
@@ -99,6 +100,10 @@ public:
     [[maybe_unused]]
     inline bool isValid() const noexcept{
         return state_ != ConnectorState::Error && state_ != ConnectorState::Disconnected;
+    }
+    
+    inline void setHandler(std::weak_ptr<IConnectorHandler> handler) noexcept{
+        handler_ = std::move(handler);
     }
 private:
     bool initData() noexcept;

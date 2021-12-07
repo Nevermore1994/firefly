@@ -32,6 +32,19 @@ Connector::Connector(std::unique_ptr<ConnectorInfo> info)
     }
 }
 
+Connector::Connector(std::unique_ptr<ConnectorInfo> info, std::weak_ptr<IConnectorHandler> handler)
+    :info_(std::move(info))
+    ,state_(ConnectorState::Unknown)
+    ,socket_(kSocketInvalid)
+    ,id_(Util::shortId())
+    ,isDelay_(true)
+    ,handler_(std::move(handler)){
+    if(info_->remoteIP.isValid()){
+        open();
+    }
+}
+
+
 bool Connector::initData() noexcept {
     bool isTcp = info_->isTcpLink();
     int streamType = isTcp ? SOCK_STREAM : SOCK_DGRAM;
@@ -139,7 +152,7 @@ void Connector::onSend() noexcept {
     //post packet to send
     auto addr = info_->remoteIP.addr();
     {
-        auto res = 1l;
+        auto res = 0l;
         std::unique_lock<std::mutex> lock(mutex_);
         while(!sendPackets_.empty()){
             if(!isValid()){
@@ -155,6 +168,10 @@ void Connector::onSend() noexcept {
 #if NETWORK_LOG
                 logi("%s socket %d, send data:%d ", info_->isTcpLink() ? "tcp" : "udp", res);
 #endif
+            }
+            
+            if(res > 0){
+                sendSize_ += res;
             }
             
             if(!packet->isValid() || res >= packet->size()){
