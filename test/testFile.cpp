@@ -10,14 +10,11 @@ using namespace firefly::FileUtil;
 
 void testFile(){
     WriteFile writeFile("test.txt");
-    writeFile.open();
     for(int i = 0; i < 1000; i++){
         writeFile.write("hello world!\n");
     }
-    writeFile.close();
     
     ReadFile readFile("test.txt");
-    readFile.open();
     for(int i = 0; i < 10; i++){
         std::cout << readFile.readCh() << std::endl;
     }
@@ -28,5 +25,5 @@ void testFile(){
     while(!readFile.readOver()){
         std::cout << "" << readFile.readLine();
     }
-    readFile.close();
+    std::cout << std::endl;
 }

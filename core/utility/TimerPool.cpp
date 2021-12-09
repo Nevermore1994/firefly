@@ -30,6 +30,7 @@ TimerPool& TimerPool::operator=(TimerPool&& lhs) noexcept {
 
 void TimerPool::clear() noexcept {
     decltype(timerInfos_) temp;
+    std::unique_lock<std::mutex> lock(mutex_);
     timerInfos_.swap(temp);
     timers_.clear();
 }

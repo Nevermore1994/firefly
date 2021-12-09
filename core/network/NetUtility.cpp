@@ -66,12 +66,12 @@ IPAddressInfo Network::str2ip(const std::string& str){
 
 std::string Network::ip2str(IPAddressInfo ip){
     char tempRes[128] = {0};
-    if(ip.type == IPType::IPv4){
+    if (ip.type == IPType::IPv4) {
         struct in_addr addr = std::get<IPv4>(ip.ip);
-        inet_ntop(AF_INET, &addr,tempRes, sizeof(tempRes));
-    } else {
+        inet_ntop(AF_INET, &addr, tempRes, sizeof(tempRes));
+    } else if (ip.type == IPType::IPv6) {
         struct in6_addr addr = std::get<IPv6>(ip.ip);
-        inet_ntop(AF_INET6, &addr,tempRes, sizeof(tempRes));
+        inet_ntop(AF_INET6, &addr, tempRes, sizeof(tempRes));
     }
     return {tempRes}; //std::string first '\0'.
 }

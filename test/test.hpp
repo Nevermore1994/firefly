@@ -21,14 +21,16 @@ inline void runTest(){
     //testThread();
     //testTimer();
     //testFile();
-    IPAddressInfo ip;
-    parseHost("baidu.com", ip);
-    std::cout << ip2str(ip) << std::endl;
-    
+//    IPAddressInfo ip;
+//    parseHost("baidu.com", ip);
+//    std::cout << ip2str(ip) << std::endl;
+//
+    using namespace std::chrono_literals;
     DnsHostInfo info("qq.com");
-    DnsParserRequest request(std::move(info), [](const DnsHostInfo& i, IPAddressInfo ip){
-        std::cout << i.host << ":" << ip2str(ip);
+    DnsParserRequest request(std::move(info), [](const DnsHostInfo& i, IPAddressInfo ip) {
+        std::cout << i.host << ":" << ip2str(ip) << std::endl;
     });
     DnsParserManager::shareInstance().parseHost(std::move(request));
-    std::cout << "self:" << ip2str(DnsParserManager::shareInstance().getMyIP()) << std::endl;
+    std::this_thread::sleep_for(1s);
+//    std::cout << "self:" << ip2str(DnsParserManager::shareInstance().getMyIP()) << std::endl;
 }
