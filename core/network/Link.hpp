@@ -9,22 +9,28 @@
 
 namespace firefly::Network{
 
-class Link :public ILink, IConnectorHandler{
+class Link : public ILink, IConnectorHandler{
 public:
-    explicit Link(LinkType type);
-    Link(LinkType type, std::weak_ptr<ILinkHandler> handler);
+    explicit Link(const LinkInfo& info);
+    Link(const LinkInfo& info, std::weak_ptr<ILinkHandler> handler);
     
     ~Link() override = default;
     inline LinkType linkType() const noexcept override{
-        return linkType_;
+        return linkInfo_.linkType;
     }
     void setDataHandler(std::weak_ptr<ILinkHandler> handler) noexcept override;
     
+    //IConnectorHandler
     void reportData(std::shared_ptr<Packet> packet) noexcept override;
     void reportError(ErrorInfo &&error) noexcept override;
     void reportState(ConnectorState state) noexcept override;
+    
+    //ILink
+    bool open() noexcept override;
+    void close() noexcept override;
+    ConnectorState state() const noexcept override;
 private:
-    LinkType linkType_;
+    LinkInfo linkInfo_;
     std::weak_ptr<ILinkHandler> handler_;
     std::shared_ptr<Connector> connector_;
 };
