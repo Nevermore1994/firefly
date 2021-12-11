@@ -11,14 +11,13 @@ using namespace firefly;
 using namespace firefly::Util;
 
 ThreadManager::ThreadManager() {
-    TimerManager::shareInstance().runLoop(10 * 1000, [this](){
+    timerId_ = TimerManager::shareInstance().runLoop(10 * 1000, [this]() {
         reportRunInfo();
     });
 }
 
 ThreadManager::~ThreadManager() {
-    std::unique_lock<std::mutex> lock(mutex_);
-    threadInfos_.clear();
+    release();
 }
 
 void ThreadManager::add(std::shared_ptr<Thread> thread) {
@@ -64,11 +63,19 @@ void ThreadManager::reportRunInfo() noexcept {
         }
         auto thread = t.lock();
         TimeStamp interval = (now - thread->getLastRunTimeStamp());
-        if(thread->isRunning() && interval >= kMaxThreadBlockTimeInterval){
+        if (thread->isRunning() && interval >= kMaxThreadBlockTimeInterval) {
             loge("ThreadManager report [%s] is blocking.", thread->getName().data());
         }
     }
-    for(auto key:expiredThreads){
+    for (auto key: expiredThreads) {
         threadInfos_.erase(key);
     }
+}
+
+void ThreadManager::release() noexcept {
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        threadInfos_.clear();
+    }
+    TimerManager::shareInstance().cancel(timerId_);
 }

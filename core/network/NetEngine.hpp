@@ -36,6 +36,8 @@ public:
     void clear() noexcept;
     void stop() noexcept;
     void setHandler(std::weak_ptr<IConnectorManager> handler) noexcept;
+    
+    void release() noexcept;
 private:
     void process() noexcept;
     void checkAllSocket(const std::vector<Socket>& readSockets, const std::vector<Socket>& writeSockets) noexcept;

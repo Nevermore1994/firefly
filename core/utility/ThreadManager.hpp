@@ -29,12 +29,15 @@ public:
     void remove(const std::shared_ptr<Thread>& thread);
     void remove(std::thread::id id);
     
+    void release() noexcept;
+    
     Thread& thisThread();
 private:
     void reportRunInfo() noexcept;
 private:
     std::unordered_map<std::thread::id, std::weak_ptr<Thread>> threadInfos_;
     std::mutex mutex_;
+    TimerId timerId_;
 };
 
 }

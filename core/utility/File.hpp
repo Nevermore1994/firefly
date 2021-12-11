@@ -20,13 +20,9 @@ enum class FileMode {
 class IFile : public NoCopyable {
 public:
     IFile(std::fstream::openmode openMode, const std::string& path);
-    
     IFile(std::fstream::openmode openMode, std::string&& path);
-    
     IFile(std::fstream::openmode openMode, const std::string& path, FileMode mode);
-    
     IFile(std::fstream::openmode openMode, std::string&& path, FileMode mode);
-    
     virtual ~IFile();
     
     inline FileMode fileMode() const noexcept {
@@ -56,23 +52,14 @@ class WriteFile : virtual public IFile {
     constexpr static uint32_t kCheckCount = 512;
 public:
     explicit WriteFile(const std::string& path);
-    
     explicit WriteFile(std::string&& path);
-    
     WriteFile(const std::string& path, FileMode mode);
-    
     WriteFile(std::string&& path, FileMode mode);
-    
     ~WriteFile() override;
-    
     void write(const std::string& str);
-    
     void write(std::string&& str);
-    
     void write(const char *data, uint32_t size);
-    
     void flush();
-
 protected:
     int32_t checkEveryN_;
     uint32_t checkCount_;
@@ -84,26 +71,16 @@ class ReadFile : virtual public IFile {
     constexpr static uint32_t kReadBuffSize = 512;
 public:
     explicit ReadFile(std::string&& path);
-    
     explicit ReadFile(const std::string& path);
-    
     ReadFile(std::string&& path, FileMode mode);
-    
     ReadFile(const std::string& path, FileMode mode);
-    
     ~ReadFile() override = default;
-    
     std::string readLine();
-    
     char readCh();
-    
     void unget();
-    
     void putback(char ch);
-    
     std::string readWord();
-    
-    inline bool readOver() const noexcept { return readOver_; }
+    inline bool readOver() const noexcept { return !fstream_.is_open() || fstream_.eof(); }
     
     inline uint64_t readSize() const noexcept { return readSize_; }
 
@@ -111,20 +88,15 @@ public:
     std::string readUntilChar(char ch);
 
 protected:
-    bool readOver_;
     uint64_t readSize_;
 };
 
 class File final : public ReadFile, public WriteFile {
 public:
     explicit File(const std::string& path);
-    
     explicit File(std::string&& path);
-    
     File(const std::string& path, FileMode mode);
-    
     File(std::string&& path, FileMode mode);
-    
     ~File() override;
 };
 

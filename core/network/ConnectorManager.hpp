@@ -10,38 +10,45 @@
 
 namespace firefly::Network{
 
-class ConnectorFactory: public IConnectorManager, std::enable_shared_from_this<ConnectorFactory>{
+class ConnectorManager : public IConnectorManager, std::enable_shared_from_this<ConnectorManager> {
 public:
-    friend class ConnectorManager;
-public:
-    ~ConnectorFactory() override;
-    ConnectorFactory();
-    
-    void reportEvent(Socket socket, ConnectorEvent event) noexcept override;
-    void send(Socket socket) noexcept override;
-    void received(Socket socket) noexcept override;
-    void onError(Socket socket, ErrorInfo&& info) noexcept override;
-    
-public:
-    std::shared_ptr<Connector> newConnector(std::unique_ptr<ConnectorInfo> info) noexcept;
-    void removeConnector(const std::shared_ptr<Connector>& connector)noexcept;
-    void removeConnector(Socket socket)noexcept;
-    void removeAllConnector() noexcept;
-private:
-    std::unordered_map<Socket, std::shared_ptr<Connector>> connectors_;
-    std::mutex mutex_;
-};
-
-class ConnectorManager{
-public:
-    static ConnectorFactory& shareInstance() noexcept{
+    static ConnectorManager& shareInstance() noexcept {
         static std::once_flag flag;
-        static std::shared_ptr<ConnectorFactory> factory;
-        std::call_once(flag, [](){
-            factory = std::make_shared<ConnectorFactory>();
+        static std::shared_ptr<ConnectorManager> factory;
+        std::call_once(flag, []() {
+            factory = std::shared_ptr<ConnectorManager>(new ConnectorManager());
         });
         return *factory;
     }
+
+public:
+    ~ConnectorManager() override;
+    
+    void reportEvent(Socket socket, ConnectorEvent event) noexcept override;
+    
+    void send(Socket socket) noexcept override;
+    
+    void received(Socket socket) noexcept override;
+    
+    void onError(Socket socket, ErrorInfo&& info) noexcept override;
+    
+    void release() noexcept;
+
+private:
+    ConnectorManager();
+
+public:
+    std::shared_ptr<Connector> newConnector(std::unique_ptr<ConnectorInfo> info) noexcept;
+    
+    void removeConnector(const std::shared_ptr<Connector>& connector) noexcept;
+    
+    void removeConnector(Socket socket) noexcept;
+    
+    void removeAllConnector() noexcept;
+
+private:
+    std::unordered_map<Socket, std::shared_ptr<Connector>> connectors_;
+    std::mutex mutex_;
 };
 
 }

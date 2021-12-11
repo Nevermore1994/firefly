@@ -16,11 +16,6 @@ TimerManager::TimerManager()
     timerThread_->start();
 }
 
-TimerManager::~TimerManager(){
-    pool_.clear();
-    timerThread_->stop();
-}
-
 void TimerManager::loop() {
     pool_.loop();
     std::this_thread::sleep_for(1ms);
@@ -35,9 +30,14 @@ TimerId TimerManager::runAfter(uint64_t delayTime, TimerCallback func) {
 }
 
 TimerId TimerManager::runLoop(uint64_t timeInterval, TimerCallback func) {
-   return pool_.runLoop(timeInterval, std::move(func));
+    return pool_.runLoop(timeInterval, std::move(func));
 }
 
 void TimerManager::cancel(TimerId id) {
     pool_.cancel(id);
+}
+
+void TimerManager::release() noexcept {
+    pool_.clear();
+    timerThread_->stop();
 }

@@ -85,10 +85,10 @@ private:
     std::atomic<bool>  isRunning_;
     std::atomic<bool>  isExit_;
     std::string name_;
-    std::thread worker_;
     std::mutex mutex_;
     std::condition_variable cond_;
     Util::TimeStamp lastRunTimeStamp_ = 0;
+    std::thread worker_;
     TimerPool timerPool_;
 };
 

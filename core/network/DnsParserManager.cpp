@@ -19,16 +19,6 @@ DnsParserRequest::DnsParserRequest(DnsHostInfo&& i, DnsParserCallBack c)
     
 }
 
-DnsParserManager::~DnsParserManager() {
-    ThreadManager::shareInstance().remove(work_);
-    {
-    
-    }
-    std::unique_lock<std::mutex> lock(mutex_);
-    work_->stop();
-    requests_.clear();
-    ipLists_.clear();
-}
 
 DnsParserManager::DnsParserManager()
     :work_(std::make_shared<Thread>("DnsParserManager",  &DnsParserManager::process, this)){
@@ -105,6 +95,14 @@ void DnsParserManager::init() noexcept {
         this->isInitialize_ = true;
     });
     
+}
+
+void DnsParserManager::release() noexcept {
+    work_->stop();
+    ThreadManager::shareInstance().remove(work_);
+    std::unique_lock<std::mutex> lock(mutex_);
+    requests_.clear();
+    ipLists_.clear();
 }
 
 

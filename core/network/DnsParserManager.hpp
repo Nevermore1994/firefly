@@ -46,23 +46,37 @@ public:
     }
     
 public:
-    ~DnsParserManager();
+    ~DnsParserManager() = default;
+    
     DnsParserManager(const DnsParserManager&) = delete;
+    
     DnsParserManager& operator=(const DnsParserManager&) = delete;
+    
     DnsParserManager(DnsParserManager&&) = delete;
+    
     DnsParserManager& operator=(DnsParserManager&&) = delete;
     
     static bool parseHost(const std::string& host, IPAddressInfo& ip) noexcept;
+    
     static bool parseHost(std::string&& host, IPAddressInfo& ip) noexcept;
+    
     void parseHost(DnsParserRequest&& info) noexcept;
+    
     std::string getMyHost() noexcept;
+    
     IPAddressInfo getMyIP() noexcept;
+    
+    void release() noexcept;
+
 private:
     DnsParserManager();
     
     void process() noexcept;
+    
     void addRequest(DnsParserRequest&& info) noexcept;
+    
     void init() noexcept;
+
 private:
     std::unordered_multimap<std::string, IPAddressInfo> ipLists_;
     std::deque<DnsParserRequest> requests_;

@@ -23,7 +23,7 @@ void testFile(){
         std::cout << readFile.readWord();
     }
     while(!readFile.readOver()){
-        std::cout << "" << readFile.readLine();
+        std::cout << " " << readFile.readLine() << std::endl;
     }
     std::cout << std::endl;
 }

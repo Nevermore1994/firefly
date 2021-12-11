@@ -23,7 +23,9 @@ public:
 
 public:
     TimerManager();
-    ~TimerManager();
+    
+    ~TimerManager() = default;
+    
     TimerManager(const TimerManager&) = delete;
     TimerManager& operator=(const TimerManager&) = delete;
     TimerManager(TimerManager&&) = delete;
@@ -34,7 +36,8 @@ public:
     TimerId runLoop(uint64_t timeInterval, TimerCallback func);
     
     void cancel(TimerId id);
-
+    
+    void release() noexcept;
 private:
     void loop();
 private:

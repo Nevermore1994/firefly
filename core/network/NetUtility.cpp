@@ -4,6 +4,7 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #include "NetUtility.hpp"
+#include "NetworkConfig.hpp"
 #include "Log.hpp"
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -167,7 +168,20 @@ bool Network::getLocalAddress(IPAddressInfo& ip){
         return false;
     }
     while (ifAddrStruct != nullptr) {
-        if(strncmp(ifAddrStruct->ifa_name, "en0", 3) == 0){
+#if NETWORK_LOG
+        IPAddressInfo info;
+        if (ifAddrStruct->ifa_addr->sa_family == AF_INET) {
+            info.ip = ((struct sockaddr_in *) ifAddrStruct->ifa_addr)->sin_addr;
+            info.type = IPType::IPv4;
+        } else if (ifAddrStruct->ifa_addr->sa_family == AF_INET6) {
+            info.ip = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_addr;
+            info.type = IPType::IPv6;
+            info.scopeID = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_scope_id;
+        }
+        logi("get local network info:%s,type:%s %s", ifAddrStruct->ifa_name,
+             info.type == IPType::IPv4 ? "ipv4:" : "ipv6", ip2str(info).c_str());
+#endif
+        if (strncmp(ifAddrStruct->ifa_name, "en0", 3) == 0) {
             if (ifAddrStruct->ifa_addr->sa_family == AF_INET) {
                 ip.ip = ((struct sockaddr_in *) ifAddrStruct->ifa_addr)->sin_addr;
                 ip.type = IPType::IPv4;

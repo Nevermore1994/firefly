@@ -30,7 +30,7 @@ void NetEngine::stop() noexcept {
     }
     isExit_ = true;
     worker_->stop();
-    worker_.reset();
+    worker_ = nullptr;
 }
 
 void NetEngine::process() noexcept {
@@ -185,13 +185,17 @@ bool NetEngine::checkSocket(Socket socket) noexcept {
     
     auto res = select(socket + 1, isConnectorReadable(type) ? &fdSet : nullptr, isConnectorWriteable(type) ? &fdSet : nullptr,
                       nullptr, &timeout);
-    if(res > 0 || errno != EBADF){
+    if (res > 0 || errno != EBADF) {
         return true;
     }
     return false;
 }
 
-void NetEngine::setHandler(std::weak_ptr<IConnectorManager> handler) noexcept{
+void NetEngine::setHandler(std::weak_ptr<IConnectorManager> handler) noexcept {
     connectorHandler_ = std::move(handler);
+}
+
+void NetEngine::release() noexcept {
+    stop();
 }
 

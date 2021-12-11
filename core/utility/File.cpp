@@ -118,28 +118,24 @@ void WriteFile::write(const char *data, uint32_t size) {
 
 ReadFile::ReadFile(const std::string& path)
     : IFile(std::fstream::in, path)
-    , readSize_(0)
-    , readOver_(false) {
+    , readSize_(0) {
 }
 
 ReadFile::ReadFile(std::string&& path)
     : IFile(std::fstream::in, path)
-    , readSize_(0)
-    , readOver_(false) {
+    , readSize_(0) {
     
 }
 
 ReadFile::ReadFile(std::string&& path, FileMode mode)
     : IFile(std::fstream::in, path, mode)
-    , readSize_(0)
-    , readOver_(false) {
+    , readSize_(0) {
     
 }
 
 ReadFile::ReadFile(const std::string& path, FileMode mode)
     : IFile(std::fstream::in, path, mode)
-    , readSize_(0)
-    , readOver_(false) {
+    , readSize_(0) {
     
 }
 
@@ -148,9 +144,6 @@ char ReadFile::readCh() {
         return EOF;
     }
     int ch = fstream_.get();
-    if (ch == EOF) {
-        readOver_ = true;
-    }
     readSize_++;
     return (char) ch;
 }
