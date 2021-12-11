@@ -21,10 +21,13 @@ DnsParserRequest::DnsParserRequest(DnsHostInfo&& i, DnsParserCallBack c)
 
 DnsParserManager::~DnsParserManager() {
     ThreadManager::shareInstance().remove(work_);
+    {
+    
+    }
     std::unique_lock<std::mutex> lock(mutex_);
+    work_->stop();
     requests_.clear();
     ipLists_.clear();
-    work_->stop();
 }
 
 DnsParserManager::DnsParserManager()
