@@ -27,6 +27,7 @@ public:
     
     //ILink
     bool open() noexcept override;
+    bool open(SocketAddressInfo info) noexcept override;
     void close() noexcept override;
     ConnectorState state() const noexcept override;
 private:

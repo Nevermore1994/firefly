@@ -12,7 +12,7 @@ using namespace firefly;
 using namespace std::chrono_literals;
 
 TimerManager::TimerManager()
-    : timerThread_(std::make_unique<Thread>("timerManager", &TimerManager::loop, this)){
+    : timerThread_(std::make_unique<Thread>("TimerManager", &TimerManager::loop, this)){
     timerThread_->start();
 }
 

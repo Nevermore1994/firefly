@@ -7,6 +7,7 @@
 #include "Log.hpp"
 #include "ConnectorManager.hpp"
 #include "PacketPool.hpp"
+#include "DnsParserManager.hpp"
 
 using namespace firefly::Network;
 
@@ -63,8 +64,21 @@ void Link::reportState(ConnectorState state) noexcept {
 }
 
 bool Link::open() noexcept {
-    //connector_ = ConnectorManager::shareInstance().newConnector();
-    return false;
+    auto info = std::make_unique<ConnectorInfo>();
+    info->connectorType = ConnectorType::ReadWrite;
+    info->remoteIP = linkInfo_.remoteAdderInfo;
+    connector_ = ConnectorManager::shareInstance().newConnector(std::move(info));
+    return true;
+}
+
+bool Link::open(SocketAddressInfo info) noexcept {
+    auto connectorInfo = std::make_unique<ConnectorInfo>();
+    connectorInfo->connectorType = ConnectorType::ReadWrite;
+    connectorInfo->remoteIP = linkInfo_.remoteAdderInfo;
+    connectorInfo->localIP = info;
+    connectorInfo->isBindPort = true;
+    connector_ = ConnectorManager::shareInstance().newConnector(std::move(connectorInfo));
+    return true;
 }
 
 void Link::close() noexcept {
@@ -79,4 +93,5 @@ ConnectorState Link::state() const noexcept {
     }
     return ConnectorState::Unknown;
 }
+
 

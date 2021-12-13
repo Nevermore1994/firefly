@@ -29,6 +29,7 @@ public:
     virtual ~ILink() noexcept = default;
     virtual LinkType linkType() const noexcept = 0;
     virtual bool open() noexcept = 0;
+    virtual bool open(SocketAddressInfo info) noexcept = 0;
     virtual void close() noexcept = 0;
     virtual ConnectorState state () const noexcept = 0;
     virtual void setDataHandler(std::weak_ptr<ILinkHandler> handler) noexcept = 0;
