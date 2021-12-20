@@ -97,12 +97,5 @@ void DnsParserManager::init() noexcept {
     
 }
 
-void DnsParserManager::release() noexcept {
-    work_->stop();
-    ThreadManager::shareInstance().remove(work_);
-    std::unique_lock<std::mutex> lock(mutex_);
-    requests_.clear();
-    ipLists_.clear();
-}
 
 

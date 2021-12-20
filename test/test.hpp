@@ -19,18 +19,6 @@
 using namespace firefly;
 using namespace firefly::Network;
 
-inline void release() {
-    NetEngine::shareInstance().release();
-    std::cout << "----- NetEngine release -----" << std::endl;
-    ConnectorManager::shareInstance().release();
-    std::cout << "----- DnsParserManager release -----" << std::endl;
-    DnsParserManager::shareInstance().release();
-    ThreadManager::shareInstance().release();
-    TimerManager::shareInstance().release();
-    std::cout << "----- release end -----" << std::endl;
-}
-
-
 inline void runTest() {
     //testPackPool();
     //testThread();
@@ -49,5 +37,4 @@ inline void runTest() {
     std::cout << "self:" << ip2str(DnsParserManager::shareInstance().getMyIP()) << std::endl;
     std::cout << "---- test end --------" << std::endl;
     std::this_thread::sleep_for(50ms);
-    release();
 }

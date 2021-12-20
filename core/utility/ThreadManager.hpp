@@ -29,8 +29,6 @@ public:
     void remove(const std::shared_ptr<Thread>& thread);
     void remove(std::thread::id id);
     
-    void release() noexcept;
-    
     Thread& thisThread();
 private:
     void reportRunInfo() noexcept;

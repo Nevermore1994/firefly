@@ -75,7 +75,3 @@ void ConnectorManager::removeAllConnector() noexcept {
     connectors_.clear();
 }
 
-void ConnectorManager::release() noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
-    connectors_.clear();
-}

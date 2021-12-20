@@ -23,16 +23,10 @@ public:
 
 public:
     ~ConnectorManager() override;
-    
     void reportEvent(Socket socket, ConnectorEvent event) noexcept override;
-    
     void send(Socket socket) noexcept override;
-    
     void received(Socket socket) noexcept override;
-    
     void onError(Socket socket, ErrorInfo&& info) noexcept override;
-    
-    void release() noexcept;
 
 private:
     ConnectorManager();

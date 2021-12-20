@@ -17,7 +17,11 @@ ThreadManager::ThreadManager() {
 }
 
 ThreadManager::~ThreadManager() {
-    release();
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        threadInfos_.clear();
+    }
+    TimerManager::shareInstance().cancel(timerId_);
 }
 
 void ThreadManager::add(std::shared_ptr<Thread> thread) {
@@ -70,12 +74,4 @@ void ThreadManager::reportRunInfo() noexcept {
     for (auto key: expiredThreads) {
         threadInfos_.erase(key);
     }
-}
-
-void ThreadManager::release() noexcept {
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        threadInfos_.clear();
-    }
-    TimerManager::shareInstance().cancel(timerId_);
 }

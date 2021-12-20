@@ -5,4 +5,4 @@
 //
 #pragma once
 
-#define NETWORK_LOG 1
+#define NETWORK_LOG 0

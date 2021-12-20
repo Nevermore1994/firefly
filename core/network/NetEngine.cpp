@@ -195,7 +195,3 @@ void NetEngine::setHandler(std::weak_ptr<IConnectorManager> handler) noexcept {
     connectorHandler_ = std::move(handler);
 }
 
-void NetEngine::release() noexcept {
-    stop();
-}
-
