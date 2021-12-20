@@ -4989,7 +4989,7 @@ scan_keyword(std::basic_istream<CharT, Traits>& is, FwdIter kb, FwdIter ke)
                 if (c == static_cast<char>(toupper(static_cast<unsigned char>((*ky)[indx]))))
                 {
                     consume = true;
-                    if (ky->size() == indx+1)
+                    if (ky->capacity() == indx+1)
                     {
                         *st = does_match;
                         --n_might_match;
@@ -5015,7 +5015,7 @@ scan_keyword(std::basic_istream<CharT, Traits>& is, FwdIter kb, FwdIter ke)
                 st = status;
                 for (auto ky = kb; ky != ke; ++ky, ++st)
                 {
-                    if (*st == does_match && ky->size() != indx+1)
+                    if (*st == does_match && ky->capacity() != indx+1)
                     {
                         *st = doesnt_match;
                         --n_does_match;

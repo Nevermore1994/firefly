@@ -6,24 +6,19 @@
 #include "DnsParserManager.hpp"
 #include "ThreadManager.hpp"
 #include "NetUtility.hpp"
+#include "Log.hpp"
 #include <future>
+
 
 using namespace firefly;
 using namespace firefly::Network;
 
 DnsParserRequest::DnsParserRequest(DnsHostInfo&& i, DnsParserCallBack c)
-    :info(i)
+    :info(std::forward<DnsHostInfo>(i))
     ,callBack(std::move(c)){
     
 }
 
-DnsParserManager::~DnsParserManager() {
-    ThreadManager::shareInstance().remove(work_);
-    std::unique_lock<std::mutex> lock(mutex_);
-    requests_.clear();
-    ipLists_.clear();
-    work_->stop();
-}
 
 DnsParserManager::DnsParserManager()
     :work_(std::make_shared<Thread>("DnsParserManager",  &DnsParserManager::process, this)){
@@ -71,7 +66,7 @@ bool DnsParserManager::parseHost(std::string&& host, IPAddressInfo& ip) noexcept
 }
 
 void DnsParserManager::parseHost(DnsParserRequest&& info) noexcept {
-    addRequest(std::move(info));
+    addRequest(std::forward<DnsParserRequest>(info));
 }
 
 std::string DnsParserManager::getMyHost() noexcept {
@@ -101,5 +96,6 @@ void DnsParserManager::init() noexcept {
     });
     
 }
+
 
 

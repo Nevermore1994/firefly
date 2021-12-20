@@ -4,8 +4,8 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #include "NetUtility.hpp"
+#include "NetworkConfig.hpp"
 #include "Log.hpp"
-#include <regex>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -67,12 +67,12 @@ IPAddressInfo Network::str2ip(const std::string& str){
 
 std::string Network::ip2str(IPAddressInfo ip){
     char tempRes[128] = {0};
-    if(ip.type == IPType::IPv4){
+    if (ip.type == IPType::IPv4) {
         struct in_addr addr = std::get<IPv4>(ip.ip);
-        inet_ntop(AF_INET, &addr,tempRes, sizeof(tempRes));
-    } else {
+        inet_ntop(AF_INET, &addr, tempRes, sizeof(tempRes));
+    } else if (ip.type == IPType::IPv6) {
         struct in6_addr addr = std::get<IPv6>(ip.ip);
-        inet_ntop(AF_INET6, &addr,tempRes, sizeof(tempRes));
+        inet_ntop(AF_INET6, &addr, tempRes, sizeof(tempRes));
     }
     return {tempRes}; //std::string first '\0'.
 }
@@ -97,7 +97,6 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
     if (res == 0) {
         struct addrinfo* info = result;
         std::vector<struct addrinfo*> addrInfos;
-        char m_ipaddr[16];
         
         while(info) {
             if(info->ai_family == PF_INET || info->ai_family == PF_INET6 || info->ai_family == PF_UNSPEC){
@@ -169,13 +168,27 @@ bool Network::getLocalAddress(IPAddressInfo& ip){
         return false;
     }
     while (ifAddrStruct != nullptr) {
-        if(strncmp(ifAddrStruct->ifa_name, "en0", 3) == 0){
+#if NETWORK_LOG
+        IPAddressInfo info;
+        if (ifAddrStruct->ifa_addr->sa_family == AF_INET) {
+            info.ip = ((struct sockaddr_in *) ifAddrStruct->ifa_addr)->sin_addr;
+            info.type = IPType::IPv4;
+        } else if (ifAddrStruct->ifa_addr->sa_family == AF_INET6) {
+            info.ip = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_addr;
+            info.type = IPType::IPv6;
+            info.scopeID = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_scope_id;
+        }
+        logi("get local network info:%s,type:%s %s", ifAddrStruct->ifa_name,
+             info.type == IPType::IPv4 ? "ipv4:" : "ipv6", ip2str(info).c_str());
+#endif
+        if (strncmp(ifAddrStruct->ifa_name, "en0", 3) == 0) {
             if (ifAddrStruct->ifa_addr->sa_family == AF_INET) {
                 ip.ip = ((struct sockaddr_in *) ifAddrStruct->ifa_addr)->sin_addr;
                 ip.type = IPType::IPv4;
             } else if (ifAddrStruct->ifa_addr->sa_family == AF_INET6) {
                 ip.ip = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_addr;
                 ip.type = IPType::IPv6;
+                ip.scopeID = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_scope_id;
             }
         }
         ifAddrStruct = ifAddrStruct->ifa_next;

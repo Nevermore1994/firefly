@@ -10,7 +10,7 @@
 #include <string>
 #include <sstream>
 
-#ifdef __GLIBC__
+#ifdef __linux__
 #include <pthread.h>
 #endif
 
@@ -36,7 +36,7 @@ std::string Util::randomString(uint32_t length) {
     return result;
 }
 
-uint64_t Util::randomId(uint32_t length) {
+uint64_t Util::randomId(uint8_t length) {
     if(length >= 18){
         throw std::runtime_error("randomId error");
     }
@@ -62,8 +62,7 @@ std::string Util::uuid() {
 
 std::vector<std::string>& Util::spiltString(const std::string& str, char flag, std::vector<std::string>& res, bool isSkipSpace) {
     std::istringstream iss(str);
-    for (std::string item; std::getline(iss, item, flag);)
-    {
+    for (std::string item; std::getline(iss, item, flag);){
         if (isSkipSpace && item.empty())
             continue;
         else

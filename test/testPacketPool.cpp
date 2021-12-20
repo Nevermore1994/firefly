@@ -7,6 +7,7 @@
 #include "testPacketPool.h"
 #include "Utility.hpp"
 #include <iostream>
+#include <utility>
 #include <vector>
 
 using namespace std;
@@ -18,11 +19,11 @@ void test(uint32_t testSize){
     for (int i = 0; i < 10; i++){
         std::string str = Util::randomString(size - 1);
         auto packet = PacketPool::shareInstance().newPacket((uint8_t*)str.data(), size);
-        printf("packet size:%u,[%d] %s \n", size, i, packet->buffer.get());
+        printf("packet capacity:%u,[%d] %s \n", size, i, packet->front());
         packets.push_back(packet);
     }
     for_each(packets.begin(), packets.end(), [](std::shared_ptr<Packet> ptr){
-        PacketPool::shareInstance().releasePacket(ptr);
+        PacketPool::shareInstance().releasePacket(std::move(ptr));
     });
     packets.clear();
 }

@@ -5,56 +5,61 @@
 //
 #pragma once
 #include <iostream>
+#include <fstream>
+#include "NoCopyable.hpp"
 
 namespace firefly::FileUtil{
 
-using FileHandle = FILE*;
-
-constexpr const char* ModeStr[] = {"rb", "wb", "wb+"};
-
-enum class FileMode
-{
-    ReadMode = 0,
-    WriteMode = 1,
-    FreeMode = 2
+enum class FileMode {
+    None = 0,
+    Append = std::fstream::app,
+    Binary = std::fstream::binary,
+    Trunc = std::fstream::trunc,
 };
 
-class IFile
-{
+class IFile : public NoCopyable {
 public:
-    explicit IFile(const std::string& path, FileMode mode);
-    explicit IFile(std::string&& path, FileMode mode);
-    IFile& operator=(const IFile&) = delete;
-    IFile(const IFile&) = delete;
-    IFile(IFile&&) = delete;
+    IFile(std::fstream::openmode openMode, const std::string& path);
+    IFile(std::fstream::openmode openMode, std::string&& path);
+    IFile(std::fstream::openmode openMode, const std::string& path, FileMode mode);
+    IFile(std::fstream::openmode openMode, std::string&& path, FileMode mode);
     virtual ~IFile();
-
-public:
-    virtual bool open() = 0;
-    virtual void close() = 0;
+    
+    inline FileMode fileMode() const noexcept {
+        return fileMode_;
+    }
+    
+    inline bool isReadFile() const noexcept {
+        return (openMode_ & std::fstream::in) == std::fstream::in;
+    }
+    
+    inline bool isWriteFile() const noexcept {
+        return (openMode_ & std::fstream::out) == std::fstream::out;
+    }
+    
+    inline std::string_view path() const noexcept {
+        return path_;
+    }
 
 protected:
+    std::fstream::openmode openMode_;
+    FileMode fileMode_;
+    std::fstream fstream_;
     std::string path_;
-    FileHandle file_ = nullptr;
-    FileMode mode_;
 };
 
-class WriteFile:virtual public IFile
-{
+class WriteFile : virtual public IFile {
     constexpr static uint32_t kCheckCount = 512;
 public:
     explicit WriteFile(const std::string& path);
     explicit WriteFile(std::string&& path);
-    virtual ~WriteFile();
+    WriteFile(const std::string& path, FileMode mode);
+    WriteFile(std::string&& path, FileMode mode);
+    ~WriteFile() override;
     void write(const std::string& str);
     void write(std::string&& str);
-    void write(const uint8_t* data, uint32_t size);
+    void write(const char *data, uint32_t size);
     void flush();
-
-public:
-    bool open() override;
-    void close() override;
-
 protected:
     int32_t checkEveryN_;
     uint32_t checkCount_;
@@ -62,39 +67,37 @@ protected:
     uint32_t writeCount_;
 };
 
-class ReadFile:virtual public IFile
-{
+class ReadFile : virtual public IFile {
+    constexpr static uint32_t kReadBuffSize = 512;
 public:
     explicit ReadFile(std::string&& path);
     explicit ReadFile(const std::string& path);
-    virtual ~ReadFile();
+    ReadFile(std::string&& path, FileMode mode);
+    ReadFile(const std::string& path, FileMode mode);
+    ~ReadFile() override = default;
     std::string readLine();
     char readCh();
-    void backFillChar(char ch);
+    void unget();
+    void putback(char ch);
     std::string readWord();
-    inline bool readOver() const { return readOver_;}
-    inline uint64_t readSize() const { return readSize_; }
+    inline bool readOver() const noexcept { return !fstream_.is_open() || fstream_.eof(); }
+    
+    inline uint64_t readSize() const noexcept { return readSize_; }
 
 public:
-    bool open() override;
-    void close() override;
     std::string readUntilChar(char ch);
 
 protected:
-    bool readOver_;
     uint64_t readSize_;
 };
 
-class File final:public ReadFile, public WriteFile
-{
+class File final : public ReadFile, public WriteFile {
 public:
-    File(const std::string& path);
-    File(std::string&& path);
-    virtual ~File();
-
-public:
-    bool open() final;
-    void close() final;
+    explicit File(const std::string& path);
+    explicit File(std::string&& path);
+    File(const std::string& path, FileMode mode);
+    File(std::string&& path, FileMode mode);
+    ~File() override;
 };
 
 }//end namespace firefly::FileUtil

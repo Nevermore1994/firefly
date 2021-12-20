@@ -7,7 +7,7 @@
 
 #include <string>
 #include "Utility.hpp"
-#include "IPAddress.hpp"
+#include "NetworkType.hpp"
 
 namespace firefly::Network{
 

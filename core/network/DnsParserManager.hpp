@@ -12,13 +12,20 @@
 #include <memory>
 #include <future>
 #include "Thread.hpp"
-#include "IPAddress.hpp"
+#include "NetworkType.hpp"
+#include "NoCopyable.hpp"
 
 namespace firefly::Network{
 
 struct DnsHostInfo{
     std::string uuid;
     std::string host;
+    
+    DnsHostInfo() = default;
+    explicit DnsHostInfo(std::string&& h)
+        :host(std::forward<std::string>(h)){
+        
+    }
 };
 
 using DnsParserCallBack = std::function<void(DnsHostInfo,IPAddressInfo)>;
@@ -31,7 +38,7 @@ struct DnsParserRequest{
     DnsParserRequest(DnsHostInfo&& info, DnsParserCallBack callBack);
 };
 
-class DnsParserManager {
+class DnsParserManager:public NoCopyable{
 
 public:
     static inline DnsParserManager& shareInstance() {
@@ -40,20 +47,15 @@ public:
     }
     
 public:
-    ~DnsParserManager();
-    DnsParserManager(const DnsParserManager&) = delete;
-    DnsParserManager& operator=(const DnsParserManager&) = delete;
-    DnsParserManager(DnsParserManager&&) = delete;
-    DnsParserManager& operator=(DnsParserManager&&) = delete;
-    
+    ~DnsParserManager() = default;
     static bool parseHost(const std::string& host, IPAddressInfo& ip) noexcept;
     static bool parseHost(std::string&& host, IPAddressInfo& ip) noexcept;
     void parseHost(DnsParserRequest&& info) noexcept;
     std::string getMyHost() noexcept;
     IPAddressInfo getMyIP() noexcept;
+
 private:
     DnsParserManager();
-    
     void process() noexcept;
     void addRequest(DnsParserRequest&& info) noexcept;
     void init() noexcept;

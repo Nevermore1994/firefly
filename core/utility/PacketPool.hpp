@@ -1,21 +1,22 @@
 //
 // Created by Nevermore on 2021/10/22.
-// firefly MemoryPool
+// firefly PacketPool
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #pragma once
 
-#include "MemoryPool.hpp"
-#include "Packet.hpp"
 #include <array>
 #include <mutex>
+#include "MemoryPool.hpp"
+#include "Packet.hpp"
+#include "NoCopyable.hpp"
 
 namespace firefly {
 
 constexpr uint32_t kPacketSize = 512;
 
 template<>
-class MemoryPool<Packet>{
+class MemoryPool<Packet> : public NoCopyable{
     using PacketPool = MemoryPool<Packet>;
     using ChunkType = std::list<std::shared_ptr<Packet>>;
 public:
@@ -25,15 +26,6 @@ public:
     }
     
 public:
-    
-    MemoryPool<Packet>(const PacketPool&) = delete;
-    
-    MemoryPool<Packet>(const PacketPool&&) = delete;
-    
-    PacketPool& operator=(const PacketPool&) = delete;
-    
-    PacketPool& operator=(const PacketPool&&) = delete;
-    
     ~MemoryPool<Packet>(){
         release();
     }
@@ -64,7 +56,7 @@ public:
             packet = pool_[typeValue].front();
             pool_[typeValue].pop_front();
         }
-        memset(packet->buffer.get(), 0, packet->size);
+        memset(packet->buffer.get(), 0, packet->capacity);
         memcpy(packet->buffer.get(), data, len);
         packet->length = len;
         return packet;

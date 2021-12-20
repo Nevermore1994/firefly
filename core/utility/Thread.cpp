@@ -8,6 +8,7 @@
 #include <pthread.h>
 #endif
 #include "Thread.hpp"
+#include "Log.hpp"
 
 using namespace firefly;
 
@@ -85,7 +86,11 @@ void Thread::process() noexcept{
 void Thread::setThreadName() noexcept{
 #ifndef __APPLE__
     auto handle = worker_.native_handle();
-    pthread_setname_np(handle,name_.c_str());
+    std::string name = name_;
+    if (name.length() > 15) {
+        name = name.substr(0, 15);
+    }
+    pthread_setname_np(handle, name.c_str());
 #else
     pthread_setname_np(name_.c_str());
 #endif

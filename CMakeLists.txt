@@ -12,6 +12,7 @@ set(INCLUDE_DIR
         ./test
         ./core/network
         ./core/utility
+        ./core/.
         ./third_party
         )
 

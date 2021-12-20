@@ -10,15 +10,17 @@
 #include <string>
 #include <functional>
 #include <atomic>
+#include <string_view>
 #include "TimerPool.hpp"
 #include "Utility.hpp"
+#include "NoCopyable.hpp"
 
 namespace firefly {
 
-class Thread{
+class Thread:public NoCopyable{
 
 public:
-    template<class Func, typename ... Args>
+    template<class Func, typename ... Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Func>, std::thread>>>
     Thread(std::string&& name, Func&& f, Args&& ... args)
         :name_(std::move(name))
         ,isRunning_(false)
@@ -30,7 +32,7 @@ public:
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
     }
     
-    template<class Func, typename ... Args>
+    template<class Func, typename ... Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Func>, std::thread>>>
     Thread(const std::string& name, Func&& f, Args&& ... args)
         :name_(name)
         ,isRunning_(false)
@@ -54,7 +56,7 @@ public:
     TimerId runAt(uint64_t timeStamp, TimerCallback func);
     TimerId runAfter(uint64_t delayTime, TimerCallback func); //ms
     
-    template<class Func, typename ... Args>
+    template<class Func, typename ... Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Func>, std::thread>>>
     void setFunc(Func&& f, Args&& ... args) noexcept{
         std::unique_lock<std::mutex> lock(mutex_);
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
@@ -72,8 +74,8 @@ public:
         return worker_.get_id();
     }
     
-    inline std::string getName() const noexcept{
-        return name_;
+    inline std::string_view getName() const noexcept{
+        return std::string_view (name_);
     }
 private:
     void process() noexcept;
@@ -83,10 +85,10 @@ private:
     std::atomic<bool>  isRunning_;
     std::atomic<bool>  isExit_;
     std::string name_;
-    std::thread worker_;
     std::mutex mutex_;
     std::condition_variable cond_;
     Util::TimeStamp lastRunTimeStamp_ = 0;
+    std::thread worker_;
     TimerPool timerPool_;
 };
 

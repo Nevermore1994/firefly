@@ -11,9 +11,9 @@
 
 namespace firefly{
 
-constexpr const Util::TimeStamp kMaxTimeInterval = 30 * 1000 * 1000;//30s
+constexpr const Util::TimeStamp kMaxThreadBlockTimeInterval = 30 * 1000 * 1000;//30s
 
-class ThreadManager{
+class ThreadManager:public NoCopyable{
 public:
     static inline ThreadManager& shareInstance(){
         static ThreadManager instance;
@@ -24,10 +24,6 @@ public:
 public:
     ThreadManager();
     ~ThreadManager();
-    ThreadManager(const ThreadManager&) = delete;
-    ThreadManager& operator=(const ThreadManager&) = delete;
-    ThreadManager(ThreadManager&&) = delete;
-    ThreadManager& operator=(ThreadManager&&) = delete;
     
     void add(std::shared_ptr<Thread> thread);
     void remove(const std::shared_ptr<Thread>& thread);
@@ -39,6 +35,7 @@ private:
 private:
     std::unordered_map<std::thread::id, std::weak_ptr<Thread>> threadInfos_;
     std::mutex mutex_;
+    TimerId timerId_;
 };
 
 }

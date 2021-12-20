@@ -11,7 +11,6 @@ using namespace firefly;
 using namespace std::chrono_literals;
 
 TimerPool::~TimerPool(){
-    std::unique_lock<std::mutex> lock(mutex_);
     clear();
 }
 
@@ -22,7 +21,6 @@ TimerPool::TimerPool(TimerPool&& lhs) noexcept {
 }
 
 TimerPool& TimerPool::operator=(TimerPool&& lhs) noexcept {
-    clear();
     timerInfos_.swap(lhs.timerInfos_);
     timers_.swap(lhs.timers_);
     return *this;
@@ -30,6 +28,7 @@ TimerPool& TimerPool::operator=(TimerPool&& lhs) noexcept {
 
 void TimerPool::clear() noexcept {
     decltype(timerInfos_) temp;
+    std::unique_lock<std::mutex> lock(mutex_);
     timerInfos_.swap(temp);
     timers_.clear();
 }
