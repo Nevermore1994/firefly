@@ -32,7 +32,7 @@ public:
 private:
     TimerId addTimer(uint64_t timeStamp, TimerCallback func, bool isLoop, uint64_t timeInterval = 0);
 private:
-    std::priority_queue<TimerInfo, std::vector<TimerInfo>, std::greater<>> timerInfos_;
+    std::priority_queue<TimerInfo, std::vector<TimerInfo>, decltype(TimerInfoCompare())> timerInfos_;
     std::unordered_map<TimerId, Timer> timers_;
     std::mutex mutex_;
 };

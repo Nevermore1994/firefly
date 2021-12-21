@@ -32,22 +32,8 @@ Timer::Timer()
 
 Timer::Timer(uint64_t timeStamp, TimerCallback f)
     : timerInfo(timeStamp)
-    , func(std::move(f)){
+    , func(std::move(f)) {
     
-}
-
-Timer::Timer(const Timer& timer) noexcept
-    : timerInfo(timer.timerInfo)
-    , func(timer.func)
-    , isValid(timer.isValid){
-    
-}
-
-Timer& Timer::operator=(const Timer& timer) noexcept{
-    this->timerInfo = timer.timerInfo;
-    this->isValid = timer.isValid;
-    this->func = timer.func;
-    return *this;
 }
 
 Timer::Timer(Timer&& timer) noexcept

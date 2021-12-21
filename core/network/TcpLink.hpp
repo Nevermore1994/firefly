@@ -4,12 +4,14 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #pragma once
-#include "ILink.hpp"
+#include "Link.hpp"
 #include <memory>
 
 namespace firefly::Network{
 
+class TcpLink:public Link{
 
+};
 
 }
 

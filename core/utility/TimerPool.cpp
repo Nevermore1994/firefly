@@ -35,30 +35,38 @@ void TimerPool::clear() noexcept {
 
 void TimerPool::loop() noexcept {
     uint64_t now = Util::nowTimeStamp();
+    std::vector<TimerInfo> expireTimes;
+    decltype(timers_) timers;
     {
         std::unique_lock<std::mutex> lock(mutex_);
-        while(!timerInfos_.empty() && now >= timerInfos_.top().expireTime){
+        while(!timerInfos_.empty() && now >= timerInfos_.top().expireTime) {
             auto expireTimeInfo = timerInfos_.top();
+            expireTimes.push_back(expireTimeInfo);
             timerInfos_.pop();
-            TimerId id = expireTimeInfo.timerId;
-            if(timers_.count(id) > 0 && timers_[id].isValid && timers_[id].timerInfo.isLoop){
-                TimerInfo timerInfo = timers_[id].timerInfo;
-                timerInfo.expireTime = now + timerInfo.loopInterval;
-                timerInfos_.push(timerInfo);
-            }
-            
-            if(timers_.count(id) ==  0){
-                timers_.erase(id);
-                continue;
-            }
-            auto& timer = timers_[id];
-            if(timer.isValid){
-                timer.func();
-            }
-            
-            if(!timer.timerInfo.isLoop){
-                timers_.erase(id);
-            }
+        }
+        timers.insert(timers_.begin(), timers_.end());
+    }
+    for(auto& expireTimeInfo:expireTimes){
+        auto id = expireTimeInfo.timerId;
+        bool canRemove = timers.count(id) == 0;
+        
+        if(canRemove){
+            continue;
+        }
+        auto& timer = timers[id];
+        if(timer.isValid){
+            timer.func();
+        }
+        canRemove = !timer.isValid || !timer.timerInfo.isLoop;
+        if(canRemove){
+            std::unique_lock<std::mutex> lock(mutex_);
+            timers_.erase(id);
+        } else {
+            TimerInfo timerInfo = timer.timerInfo;
+            timerInfo.expireTime = now + timerInfo.loopInterval;
+            //add loop timer
+            std::unique_lock<std::mutex> lock(mutex_);
+            timerInfos_.push(timerInfo);
         }
     }
 }

@@ -33,12 +33,17 @@ struct TimerInfo{
     TimerInfo& operator=(TimerInfo&& info) = default;
 };
 
+struct TimerInfoCompare{
+    bool operator()(const TimerInfo& lhs, const TimerInfo& rhs) const{
+        return lhs < rhs;
+    }
+};
 
 struct Timer{
     Timer();
     Timer(uint64_t timeStamp, TimerCallback f);
-    Timer(const Timer& timer) noexcept;
-    Timer& operator=(const Timer& timer) noexcept;
+    Timer(const Timer& timer) = default;
+    Timer& operator=(const Timer& timer) = default;
     Timer(Timer&& timer) noexcept;
     Timer& operator=(Timer&& timer) noexcept;
 public:

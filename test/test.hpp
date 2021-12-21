@@ -22,7 +22,7 @@ using namespace firefly::Network;
 inline void runTest() {
     //testPackPool();
     //testThread();
-    //testTimer();
+    testTimer();
     //testFile();
     IPAddressInfo ip;
     parseHost("baidu.com", ip);

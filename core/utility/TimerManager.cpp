@@ -23,7 +23,6 @@ TimerManager::~TimerManager() noexcept {
 
 void TimerManager::loop() {
     pool_.loop();
-    std::this_thread::sleep_for(1ms);
 }
 
 TimerId TimerManager::runAt(uint64_t timeStamp, TimerCallback func) {
