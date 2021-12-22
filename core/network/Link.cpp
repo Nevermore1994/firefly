@@ -34,7 +34,7 @@ void Link::reportData(std::shared_ptr<Packet> packet) noexcept {
     auto handler = handler_.lock();
     assert(handler != nullptr);
     if(handler){
-        handler->onDataReceived(reinterpret_cast<const char*>(packet->front()), packet->size(), Util::nowTimeStamp());
+        handler->onDataReceived(reinterpret_cast<const char*>(packet->front()), packet->size(), Time::nowTimeStamp());
         PacketPool::shareInstance().releasePacket(packet);
     }
 }

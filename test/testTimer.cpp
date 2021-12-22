@@ -9,33 +9,33 @@
 
 using namespace std;
 using namespace firefly;
+using namespace std::chrono;
 using namespace chrono_literals;
 
-
 void testTimer(){
-    uint64_t now = Util::nowTimeStamp();
+    uint64_t now = Time::nowTimeStamp();
     cout << "test timer start:" << now << endl;
-    TimerId t = TimerManager::shareInstance().runAfter(7, [&](){
-        cout << "test runAfter first:"<< (Util::nowTimeStamp() - now) / 1000 << endl;
+    TimerManager::shareInstance().runAfter(7ms, [&](){
+        cout << "test runAfter first:"<< (Time::nowTimeStamp() - now) / 1000 << endl;
     });
-    auto t2 = TimerManager::shareInstance().runLoop(10, [&](){
+    auto t2 = TimerManager::shareInstance().runLoop(100ms, [&](){
         static int count = 0;
-        auto t = Util::nowTimeStamp();
+        auto t = Time::nowTimeStamp();
         cout << "test runLoop:"<< (t - now) / 1000 << ", count:" << ++count << endl;
         now = t;
     });
     std::this_thread::sleep_for(1000ms);
     TimerManager::shareInstance().cancel(t2);
-    cout << "------ test timer t1  end:" << Util::nowTimeStamp() << endl;
+    cout << "------ test timer t1  end:" << Time::nowTimeStamp() << endl;
     
     for(int i = 0; i < 100; i++){
-        TimerManager::shareInstance().runAfter(i + 10, [i](){
-            cout << "test runAfter:"<< i << " "<< Util::nowTimeStamp()  << endl;
-            TimerManager::shareInstance().runAfter(i * 10, [i](){
-                cout << "test runAfter2:"<< i << " "<< Util::nowTimeStamp() << endl;
+        TimerManager::shareInstance().runAfter(milliseconds(i), [i](){
+            cout << "test runAfter:"<< i << " "<< Time::nowTimeStamp()  << endl;
+            TimerManager::shareInstance().runAfter(milliseconds(i * 10),[i](){
+                cout << "test runAfter2:"<< i << " "<< Time::nowTimeStamp() << endl;
             });
         });
     }
     std::this_thread::sleep_for(2000ms);
-    cout << "------ test timer t2  end:" << Util::nowTimeStamp() << endl;
+    cout << "------ test timer t2  end:" << Time::nowTimeStamp() << endl;
 }

@@ -14,10 +14,6 @@
 
 namespace firefly::Util {
 
-//time
-using TimeStamp = uint64_t;
-TimeStamp nowTimeStamp();
-
 //random
 template<typename T>
 T random(T min, T max){

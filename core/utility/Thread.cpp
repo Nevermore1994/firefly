@@ -11,6 +11,7 @@
 #include "Log.hpp"
 
 using namespace firefly;
+using namespace std::chrono;
 
 Thread::Thread(const std::string& name)
     :name_(name)
@@ -68,7 +69,7 @@ void Thread::process() noexcept{
     setThreadName();
     while(!isExit_){
         if(isRunning_){
-            lastRunTimeStamp_ = Util::nowTimeStamp();
+            lastRunTimeStamp_ = Time::nowTimeStamp();
             timerPool_.loop();
             if(func_){
                 func_();
@@ -96,11 +97,15 @@ void Thread::setThreadName() noexcept{
 #endif
 }
 
-TimerId Thread::runAt(uint64_t timeStamp, TimerCallback func) {
+TimerId Thread::runAt(uint64_t timeStamp, TimerCallback func) noexcept {
     return timerPool_.runAt(timeStamp, std::move(func));
 }
 
-TimerId Thread::runAfter(uint64_t delayTime, TimerCallback func) {
+TimerId Thread::runAfter(uint64_t delayTime, TimerCallback func) noexcept {
+    return timerPool_.runAfter(delayTime, std::move(func));
+}
+
+TimerId Thread::runAfter(milliseconds delayTime, TimerCallback func) noexcept{
     return timerPool_.runAfter(delayTime, std::move(func));
 }
 

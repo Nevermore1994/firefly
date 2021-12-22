@@ -53,8 +53,9 @@ public:
     void resume() noexcept;
     void stop() noexcept;
     
-    TimerId runAt(uint64_t timeStamp, TimerCallback func);
-    TimerId runAfter(uint64_t delayTime, TimerCallback func); //ms
+    TimerId runAt(uint64_t timeStamp, TimerCallback func) noexcept;
+    TimerId runAfter(uint64_t delayTime, TimerCallback func) noexcept; //ms
+    TimerId runAfter(std::chrono::milliseconds delayTime, TimerCallback func) noexcept;
     
     template<class Func, typename ... Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Func>, std::thread>>>
     void setFunc(Func&& f, Args&& ... args) noexcept{
@@ -66,7 +67,7 @@ public:
         return isRunning_.load();
     }
     
-    inline Util::TimeStamp getLastRunTimeStamp() const noexcept{
+    inline Time::TimeStamp getLastRunTimeStamp() const noexcept{
         return lastRunTimeStamp_;
     }
     
@@ -87,7 +88,7 @@ private:
     std::string name_;
     std::mutex mutex_;
     std::condition_variable cond_;
-    Util::TimeStamp lastRunTimeStamp_ = 0;
+    Time::TimeStamp lastRunTimeStamp_ = 0;
     std::thread worker_;
     TimerPool timerPool_;
 };

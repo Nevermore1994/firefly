@@ -18,11 +18,6 @@ using namespace firefly;
 using namespace firefly::Util;
 using namespace std::literals;
 
-TimeStamp Util::nowTimeStamp(){
-    auto tp = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now());
-    return tp.time_since_epoch().count();
-}
-
 std::string Util::randomString(uint32_t length) {
     static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"s;
     std::string result;

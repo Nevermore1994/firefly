@@ -5,9 +5,11 @@
 //
 #include "TimerPool.hpp"
 #include "Utility.hpp"
+#include "Log.hpp"
 #include <chrono>
 
 using namespace firefly;
+using namespace std::chrono;
 using namespace std::chrono_literals;
 
 TimerPool::~TimerPool(){
@@ -34,7 +36,7 @@ void TimerPool::clear() noexcept {
 }
 
 void TimerPool::loop() noexcept {
-    uint64_t now = Util::nowTimeStamp();
+    uint64_t now = Time::nowTimeStamp();
     std::vector<TimerInfo> expireTimes;
     decltype(timers_) timers;
     {
@@ -51,6 +53,7 @@ void TimerPool::loop() noexcept {
         bool canRemove = timers.count(id) == 0;
         
         if(canRemove){
+            remove(id);
             continue;
         }
         auto& timer = timers[id];
@@ -59,8 +62,7 @@ void TimerPool::loop() noexcept {
         }
         canRemove = !timer.isValid || !timer.timerInfo.isLoop;
         if(canRemove){
-            std::unique_lock<std::mutex> lock(mutex_);
-            timers_.erase(id);
+            remove(id);
         } else {
             TimerInfo timerInfo = timer.timerInfo;
             timerInfo.expireTime = now + timerInfo.loopInterval;
@@ -71,7 +73,7 @@ void TimerPool::loop() noexcept {
     }
 }
 
-TimerId TimerPool::addTimer(uint64_t timeStamp, TimerCallback func, bool isLoop, uint64_t timeInterval) {
+TimerId TimerPool::addTimer(uint64_t timeStamp, TimerCallback func, bool isLoop, uint64_t timeInterval) noexcept {
     Timer timer(timeStamp, std::move(func));
     timer.timerInfo.isLoop = isLoop;
     timer.timerInfo.loopInterval = timeInterval;
@@ -84,25 +86,42 @@ TimerId TimerPool::addTimer(uint64_t timeStamp, TimerCallback func, bool isLoop,
     return id;
 }
 
-TimerId TimerPool::runAt(uint64_t timeStamp, TimerCallback func) {
+TimerId TimerPool::runAt(uint64_t timeStamp, TimerCallback func) noexcept{
     return addTimer(timeStamp, std::move(func), false);
 }
 
-TimerId TimerPool::runAfter(uint64_t delayTime, TimerCallback func) {
-    uint64_t now = Util::nowTimeStamp();
+TimerId TimerPool::runAfter(uint64_t delayTime, TimerCallback func) noexcept {
+    auto now = Time::nowTimeStamp();
     return addTimer(now + delayTime * 1000, std::move(func), false);
 }
 
-TimerId TimerPool::runLoop(uint64_t timeInterval, TimerCallback func) {
-    uint64_t now = Util::nowTimeStamp();
+TimerId TimerPool::runLoop(uint64_t timeInterval, TimerCallback func) noexcept {
+    auto now = Time::nowTimeStamp();
     return addTimer(now + timeInterval * 1000, std::move(func), true, timeInterval * 1000);
 }
 
+TimerId TimerPool::runAfter(milliseconds delayTime, TimerCallback func) noexcept {
+    auto now = Time::nowTimeStamp();
+    auto t = std::chrono::duration_cast<microseconds>(delayTime).count();
+    return addTimer(now + t, std::move(func), false);
+}
+
+TimerId TimerPool::runLoop(milliseconds timeInterval, TimerCallback func) noexcept {
+    auto now = Time::nowTimeStamp();
+    auto t = std::chrono::duration_cast<microseconds>(timeInterval).count();
+    
+    return addTimer(now + t, std::move(func), true, t);
+}
+
 void TimerPool::cancel(TimerId id) {
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        if(timers_.count(id)){
-            timers_[id].isValid = false;
-        }
+    std::unique_lock<std::mutex> lock(mutex_);
+    if(timers_.count(id)){
+        timers_[id].isValid = false;
     }
 }
+
+void TimerPool::remove(TimerId id) noexcept {
+    std::unique_lock<std::mutex> lock(mutex_);
+    timers_.erase(id);
+}
+

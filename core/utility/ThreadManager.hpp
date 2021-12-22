@@ -11,7 +11,7 @@
 
 namespace firefly{
 
-constexpr const Util::TimeStamp kMaxThreadBlockTimeInterval = 30 * 1000 * 1000;//30s
+constexpr const Time::TimeStamp kMaxThreadBlockTimeInterval = std::chrono::seconds(30).count(); //30s
 
 class ThreadManager:public NoCopyable{
 public:

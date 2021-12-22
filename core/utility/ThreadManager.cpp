@@ -9,9 +9,11 @@
 
 using namespace firefly;
 using namespace firefly::Util;
+using namespace firefly::Time;
+using namespace std::chrono_literals;
 
 ThreadManager::ThreadManager() {
-    timerId_ = TimerManager::shareInstance().runLoop(10 * 1000, [this]() {
+    timerId_ = TimerManager::shareInstance().runLoop(10s, [this]() {
         reportRunInfo();
     });
 }

@@ -26,7 +26,7 @@ struct TimerInfo{
     bool operator<(const TimerInfo& rhs) const noexcept;
     bool operator>(const TimerInfo& rhs) const noexcept;
     
-    TimerInfo(uint64_t time);
+    explicit TimerInfo(uint64_t time);
     TimerInfo(const TimerInfo& info) = default;
     TimerInfo& operator=(const TimerInfo& info) = default;
     TimerInfo(TimerInfo&& info) = default;
@@ -35,7 +35,7 @@ struct TimerInfo{
 
 struct TimerInfoCompare{
     bool operator()(const TimerInfo& lhs, const TimerInfo& rhs) const{
-        return lhs < rhs;
+        return lhs > rhs;
     }
 };
 
