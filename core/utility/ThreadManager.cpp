@@ -58,7 +58,7 @@ Thread& ThreadManager::thisThread() {
 void ThreadManager::reportRunInfo() noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     TimeStamp now = nowTimeStamp();
-    logi("ThreadManager report now:%llu, thread:%lu", now, threadInfos_.size());
+    logi("ThreadManager report now:%llu, now live size :%lu", now, threadInfos_.size());
     //todo replace C++20 std::erase_if
     std::vector<std::thread::id> expiredThreads;
     for(auto& pair:threadInfos_){

@@ -53,7 +53,6 @@ void TimerPool::loop() noexcept {
         bool canRemove = timers.count(id) == 0;
         
         if(canRemove){
-            remove(id);
             continue;
         }
         auto& timer = timers[id];
