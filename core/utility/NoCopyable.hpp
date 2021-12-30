@@ -10,7 +10,7 @@ namespace firefly{
 class NoCopyable{
 public:
     NoCopyable() = default;
-    ~NoCopyable() = default;
+    virtual ~NoCopyable() = default;
     NoCopyable(const NoCopyable&) = delete;
     NoCopyable& operator=(const NoCopyable&) = delete;
     NoCopyable(NoCopyable&&) = delete;

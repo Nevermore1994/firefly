@@ -10,7 +10,7 @@
 namespace firefly{
 
 enum class LogType{
-    Debug = 1,
+    Debug = 0,
     Info,
     Warning,
     Error,
