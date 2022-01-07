@@ -11,22 +11,22 @@ using namespace firefly;
 
 TimerInfo::TimerInfo(uint64_t time)
     : expireTime(time)
-    , timerId(Util::shortId()){
-
+    , timerId(Util::shortId()) {
+    
 }
 
-bool TimerInfo::operator<(const TimerInfo &rhs) const noexcept {
+bool TimerInfo::operator<(const TimerInfo& rhs) const noexcept {
     return expireTime < rhs.expireTime;
 }
 
-bool TimerInfo::operator>(const TimerInfo &rhs) const noexcept {
+bool TimerInfo::operator>(const TimerInfo& rhs) const noexcept {
     return expireTime > rhs.expireTime;
 }
 
 Timer::Timer()
     : timerInfo(0)
     , func(nullptr)
-    , isValid(false){
+    , isValid(false) {
     
 }
 
@@ -37,9 +37,9 @@ Timer::Timer(uint64_t timeStamp, TimerCallback f)
 }
 
 Timer::Timer(Timer&& timer) noexcept
-        : timerInfo(timer.timerInfo)
-        , func(std::move(timer.func))
-        , isValid(timer.isValid){
+    : timerInfo(timer.timerInfo)
+    , func(std::move(timer.func))
+    , isValid(timer.isValid) {
     
 }
 

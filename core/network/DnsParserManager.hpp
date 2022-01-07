@@ -15,50 +15,63 @@
 #include "NetworkType.hpp"
 #include "NoCopyable.hpp"
 
-namespace firefly::Network{
+namespace firefly::Network {
 
-struct DnsHostInfo{
+struct DnsHostInfo {
     std::string uuid;
     std::string host;
     
     DnsHostInfo() = default;
+    
     explicit DnsHostInfo(std::string&& h)
-        :host(std::forward<std::string>(h)){
+        : host(std::forward<std::string>(h)) {
         
     }
 };
 
-using DnsParserCallBack = std::function<void(DnsHostInfo,IPAddressInfo)>;
-struct DnsParserRequest{
+using DnsParserCallBack = std::function<void(DnsHostInfo, IPAddressInfo)>;
+
+struct DnsParserRequest {
     DnsHostInfo info;
     DnsParserCallBack callBack;
     
     DnsParserRequest() = default;
+    
     ~DnsParserRequest() = default;
+    
     DnsParserRequest(DnsHostInfo&& info, DnsParserCallBack callBack);
 };
 
-class DnsParserManager:public NoCopyable{
+class DnsParserManager : public NoCopyable {
 
 public:
     static inline DnsParserManager& shareInstance() {
         static DnsParserManager instance;
         return instance;
     }
-    
+
 public:
     ~DnsParserManager() = default;
+    
     static bool parseHost(const std::string& host, IPAddressInfo& ip) noexcept;
+    
     static bool parseHost(std::string&& host, IPAddressInfo& ip) noexcept;
+    
     void parseHost(DnsParserRequest&& info) noexcept;
+    
     std::string getMyHost() noexcept;
+    
     IPAddressInfo getMyIP() noexcept;
 
 private:
     DnsParserManager();
+    
     void process() noexcept;
+    
     void addRequest(DnsParserRequest&& info) noexcept;
+    
     void init() noexcept;
+
 private:
     std::unordered_multimap<std::string, IPAddressInfo> ipLists_;
     std::deque<DnsParserRequest> requests_;

@@ -18,31 +18,42 @@ namespace firefly::Network {
 
 constexpr const int kMaxSocketSize = 255;
 
-class NetEngine:public NoCopyable{
+class NetEngine : public NoCopyable {
 
 public:
-    inline static NetEngine& shareInstance(){
+    inline static NetEngine& shareInstance() {
         static NetEngine instance;
         return instance;
     }
-    
+
 public:
     ~NetEngine();
+
 private:
     NetEngine();
+
 public:
     void add(Socket socket, ConnectorType type) noexcept;
-    void remove(Socket socket) noexcept;
-    void clear() noexcept;
-    void stop() noexcept;
-    void setHandler(std::weak_ptr<IConnectorManager> handler) noexcept;
     
+    void remove(Socket socket) noexcept;
+    
+    void clear() noexcept;
+    
+    void stop() noexcept;
+    
+    void setHandler(std::weak_ptr<IConnectorManager> handler) noexcept;
+
 private:
     void process() noexcept;
+    
     void checkAllSocket(const std::vector<Socket>& readSockets, const std::vector<Socket>& writeSockets) noexcept;
+    
     bool checkSocket(Socket socket) noexcept;
+    
     void sendData(Socket socket) noexcept;
+    
     void receiveData(Socket socket) noexcept;
+
 private:
     std::unordered_set<Socket> readSet_;
     std::unordered_set<Socket> writeSet_;

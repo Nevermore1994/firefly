@@ -10,16 +10,15 @@
 #include <variant>
 #include <cassert>
 
-namespace firefly::Network{
+namespace firefly::Network {
 
-enum class IPType{
+enum class IPType {
     Unknown = 0,
     IPv4 = 1,
     IPv6,
 };
 
-enum class LinkType
-{
+enum class LinkType {
     Unknown = 0,
     UDP = 1,
     TCP = 2,
@@ -38,32 +37,37 @@ using IPv6 = struct in6_addr;
 using IPAddr = std::variant<IPv4, IPv6>;
 using Port = uint16_t;
 
-struct IPAddressInfo{
+struct IPAddressInfo {
     IPAddr ip;
     IPType type;
     uint32_t scopeID;
     
     IPAddressInfo()
-        :type(IPType::Unknown)
-        ,scopeID(0){
+        : type(IPType::Unknown)
+        , scopeID(0) {
         
     }
     
     IPv4 getIPv4();
+    
     IPv6 getIPv6();
 };
 
-struct SocketAddressInfo{
+struct SocketAddressInfo {
     IPAddressInfo ipInfo;
-    Port  port;
+    Port port;
     SocketAddrType socketInfo;
     
     SocketAddressInfo();
+    
     SocketAddressInfo(IPAddressInfo info, Port port);
+    
     uint32_t size() const noexcept;
+    
     SocketAddr addr() const noexcept;
+
 public:
-    inline bool isValid() const noexcept{
+    inline bool isValid() const noexcept {
         return ipInfo.type != IPType::Unknown;
     }
 };

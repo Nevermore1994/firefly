@@ -7,7 +7,7 @@
 
 using namespace firefly::Time;
 
-TimeStamp firefly::Time::nowTimeStamp(){
+TimeStamp firefly::Time::nowTimeStamp() {
     auto tp = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now());
     return tp.time_since_epoch().count();
 }

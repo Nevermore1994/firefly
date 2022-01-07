@@ -5,6 +5,7 @@
 //
 
 #pragma once
+
 #include <cstdint>
 #include <unordered_map>
 #include <list>
@@ -15,24 +16,25 @@
 namespace firefly {
 
 template<class T, uint32_t BlockSize = 512>
-class MemoryPool: public NoCopyable{
+class MemoryPool : public NoCopyable {
     using ChunkType = std::list<std::shared_ptr<T>>;
 public:
     MemoryPool()
-        :size_(BlockSize){
+        : size_(BlockSize) {
         
     }
     
-    ~MemoryPool(){
+    ~MemoryPool() {
         release();
     }
     
-    void release(){
-        for(auto& pair:pool){
+    void release() {
+        for(auto& pair: pool) {
             pair.second.clear();
         }
         pool.clear();
     }
+
 private:
     std::unordered_map<uint32_t, ChunkType> pool;
     uint32_t size_;

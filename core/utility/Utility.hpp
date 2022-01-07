@@ -16,10 +16,10 @@ namespace firefly::Util {
 
 //random
 template<typename T>
-T random(T min, T max){
+T random(T min, T max) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    if(std::is_floating_point_v<T>){
+    if(std::is_floating_point_v<T>) {
         std::uniform_real_distribution<double> dis(min, max);
         return dis(gen);
     } else {
@@ -29,8 +29,8 @@ T random(T min, T max){
 }
 
 template<typename T>
-std::vector<T> reservoirSampling(const std::vector<T>& source, uint32_t count){
-    if(count >= source.size()){
+std::vector<T> reservoirSampling(const std::vector<T>& source, uint32_t count) {
+    if(count >= source.size()) {
         return {source.begin(), source.end()};
     }
     std::random_device rd;
@@ -41,14 +41,17 @@ std::vector<T> reservoirSampling(const std::vector<T>& source, uint32_t count){
 }
 
 std::string randomString(uint32_t length);
+
 uint64_t randomId(uint8_t length);
 
 //id
 uint32_t shortId();
+
 std::string uuid();
 
 //string
-std::vector<std::string>& spiltString(const std::string& str, char flag, std::vector<std::string>& res, bool isSkipSpace = true);
+std::vector<std::string>&
+spiltString(const std::string& str, char flag, std::vector<std::string>& res, bool isSkipSpace = true);
 
 }// end namespace firefly::Util
 

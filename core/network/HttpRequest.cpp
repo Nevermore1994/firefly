@@ -5,6 +5,7 @@
 //
 #include "HttpRequest.hpp"
 #include "Utility.hpp"
+
 using namespace firefly::Network;
 
 HttpRequest::HttpRequest(const std::string& url)
@@ -15,7 +16,7 @@ HttpRequest::HttpRequest(const std::string& url)
     , rangeStart_(0)
     , rangeEnd_(0)
     , requestId_(Util::randomString(20))
-    , requestUrl_(url){
+    , requestUrl_(url) {
     
 }
 
@@ -27,7 +28,7 @@ HttpRequest::HttpRequest(std::string&& url)
     , rangeStart_(0)
     , rangeEnd_(0)
     , requestId_(Util::randomString(20))
-    , requestUrl_(url){
+    , requestUrl_(url) {
     
 }
 

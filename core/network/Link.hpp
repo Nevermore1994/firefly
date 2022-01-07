@@ -4,32 +4,42 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #pragma once
+
 #include "ILink.hpp"
 #include "Connector.hpp"
 
-namespace firefly::Network{
+namespace firefly::Network {
 
-class Link : public ILink, IConnectorHandler{
+class Link : public ILink, IConnectorHandler {
 public:
     explicit Link(const LinkInfo& info);
+    
     Link(const LinkInfo& info, std::weak_ptr<ILinkHandler> handler);
     
     ~Link() override = default;
-    inline LinkType linkType() const noexcept override{
+    
+    inline LinkType linkType() const noexcept override {
         return linkInfo_.linkType;
     }
+    
     void setDataHandler(std::weak_ptr<ILinkHandler> handler) noexcept override;
     
     //IConnectorHandler
     void reportData(std::shared_ptr<Packet> packet) noexcept override;
-    void reportError(ErrorInfo &&error) noexcept override;
+    
+    void reportError(ErrorInfo&& error) noexcept override;
+    
     void reportState(ConnectorState state) noexcept override;
     
     //ILink
     bool open() noexcept override;
+    
     bool open(SocketAddressInfo info) noexcept override;
+    
     void close() noexcept override;
+    
     ConnectorState state() const noexcept override;
+
 private:
     LinkInfo linkInfo_;
     std::weak_ptr<ILinkHandler> handler_;

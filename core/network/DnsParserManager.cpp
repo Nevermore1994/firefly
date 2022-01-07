@@ -14,14 +14,14 @@ using namespace firefly;
 using namespace firefly::Network;
 
 DnsParserRequest::DnsParserRequest(DnsHostInfo&& i, DnsParserCallBack c)
-    :info(std::forward<DnsHostInfo>(i))
-    ,callBack(std::move(c)){
+    : info(std::forward<DnsHostInfo>(i))
+    , callBack(std::move(c)) {
     
 }
 
 
 DnsParserManager::DnsParserManager()
-    :work_(std::make_shared<Thread>("DnsParserManager",  &DnsParserManager::process, this)){
+    : work_(std::make_shared<Thread>("DnsParserManager", &DnsParserManager::process, this)) {
     ThreadManager::shareInstance().add(work_);
 }
 
@@ -30,7 +30,7 @@ void DnsParserManager::addRequest(DnsParserRequest&& info) noexcept {
         std::unique_lock<std::mutex> lock(mutex_);
         requests_.push_back(std::move(info));
     }
-    if(!work_->isRunning()){
+    if(!work_->isRunning()) {
         work_->resume();
     }
 }
@@ -41,21 +41,21 @@ void DnsParserManager::process() noexcept {
         std::unique_lock<std::mutex> lock(mutex_);
         requests.swap(requests_);
     }
-    if(requests.empty()){
+    if(requests.empty()) {
         work_->pause();
         return;
     }
-    for(auto& request:requests){
+    for(auto& request: requests) {
         Network::IPAddressInfo ipAddressInfo;
-        if(Network::parseHost(request.info.host, ipAddressInfo)){
+        if(Network::parseHost(request.info.host, ipAddressInfo)) {
             request.callBack(request.info, ipAddressInfo);
         }
     }
 }
 
 bool DnsParserManager::parseHost(const std::string& host, IPAddressInfo& ip) noexcept {
-    auto res = std::async(std::launch::async, [&host, &ip](){
-       return Network::parseHost(host, ip);
+    auto res = std::async(std::launch::async, [&host, &ip]() {
+        return Network::parseHost(host, ip);
     });
     res.wait();
     return res.get();
@@ -70,22 +70,22 @@ void DnsParserManager::parseHost(DnsParserRequest&& info) noexcept {
 }
 
 std::string DnsParserManager::getMyHost() noexcept {
-    if(!isInitialize_){
+    if(!isInitialize_) {
         init();
     }
     return myHost_;
 }
 
 IPAddressInfo DnsParserManager::getMyIP() noexcept {
-    if(!isInitialize_){
+    if(!isInitialize_) {
         init();
     }
     return myIP_;
 }
 
 void DnsParserManager::init() noexcept {
-    std::call_once(flag_, [this](){
-        auto res = std::async(std::launch::async, [this](){
+    std::call_once(flag_, [this]() {
+        auto res = std::async(std::launch::async, [this]() {
             bool isSuccess = false;
             this->myHost_ = Network::getHostName();
             isSuccess = Network::getLocalAddress(this->myIP_);

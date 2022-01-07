@@ -17,15 +17,16 @@ using namespace firefly;
 using namespace firefly::Network;
 using namespace std::literals;
 
-bool isIP(const std::string& ipstr, IPType type){
-    if(ipstr.empty())
+bool isIP(const std::string& ipstr, IPType type) {
+    if(ipstr.empty()) {
         return false;
-    if(type == IPType::IPv6){
+    }
+    if(type == IPType::IPv6) {
         struct in6_addr addr{};
-        return inet_pton(AF_INET6, ipstr.c_str(), (void *)&addr) == 1;
+        return inet_pton(AF_INET6, ipstr.c_str(), (void *) &addr) == 1;
     } else {
         struct in_addr addr{};
-        return inet_pton(AF_INET, ipstr.c_str(), (void *)&addr) == 1;
+        return inet_pton(AF_INET, ipstr.c_str(), (void *) &addr) == 1;
     }
 }
 
@@ -33,79 +34,78 @@ bool Network::isIP(const std::string& str) {
     return isIPv6(str) || isIPv4(str);
 }
 
-bool Network::isIPv6(const std::string& ipstr){
+bool Network::isIPv6(const std::string& ipstr) {
     return ::isIP(ipstr, IPType::IPv6);
 }
 
-bool Network::isIPv6(std::string&& ipstr){
+bool Network::isIPv6(std::string&& ipstr) {
     return ::isIP(ipstr, IPType::IPv6);
 }
 
-bool Network::isIPv4(const std::string& ipstr){
+bool Network::isIPv4(const std::string& ipstr) {
     return ::isIP(ipstr, IPType::IPv4);
 }
 
-bool Network::isIPv4(std::string&& ipstr){
+bool Network::isIPv4(std::string&& ipstr) {
     return ::isIP(ipstr, IPType::IPv4);
 }
 
-IPAddressInfo Network::str2ip(const std::string& str){
+IPAddressInfo Network::str2ip(const std::string& str) {
     IPAddressInfo address;
-    if(isIPv6(str)){
+    if(isIPv6(str)) {
         struct in6_addr addr{};
-        inet_pton(AF_INET6, str.c_str(), (void *)&addr);
+        inet_pton(AF_INET6, str.c_str(), (void *) &addr);
         address.ip = addr;
         address.type = IPType::IPv6;
     } else {
         struct in_addr addr{};
-        inet_pton(AF_INET, str.c_str(), (void *)&addr);
+        inet_pton(AF_INET, str.c_str(), (void *) &addr);
         address.ip = addr;
         address.type = IPType::IPv4;
     }
     return address;
 }
 
-std::string Network::ip2str(IPAddressInfo ip){
+std::string Network::ip2str(IPAddressInfo ip) {
     char tempRes[128] = {0};
-    if (ip.type == IPType::IPv4) {
+    if(ip.type == IPType::IPv4) {
         struct in_addr addr = std::get<IPv4>(ip.ip);
         inet_ntop(AF_INET, &addr, tempRes, sizeof(tempRes));
-    } else if (ip.type == IPType::IPv6) {
+    } else if(ip.type == IPType::IPv6) {
         struct in6_addr addr = std::get<IPv6>(ip.ip);
         inet_ntop(AF_INET6, &addr, tempRes, sizeof(tempRes));
     }
     return {tempRes}; //std::string first '\0'.
 }
 
-bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAddressv6>& ipInfo)
-{
+bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAddressv6>& ipInfo) {
     struct addrinfo hints{};
     memset(&hints, 0, sizeof(hints));
     
     hints.ai_family = PF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_ADDRCONFIG|AI_V4MAPPED;
+    hints.ai_flags = AI_ADDRCONFIG | AI_V4MAPPED;
     
-    if (isIP(host)) {
+    if(isIP(host)) {
         hints.ai_flags |= AI_NUMERICHOST;
     }
     
-    constexpr static const char* kService = "http";
+    constexpr static const char *kService = "http";
     struct addrinfo *result = nullptr;
     auto res = getaddrinfo(host.c_str(), kService, &hints, &result);//getaddrinfo function is reentrant
     
-    if (res == 0) {
-        struct addrinfo* info = result;
-        std::vector<struct addrinfo*> addrInfos;
+    if(res == 0) {
+        struct addrinfo *info = result;
+        std::vector<struct addrinfo *> addrInfos;
         
         while(info) {
-            if(info->ai_family == PF_INET || info->ai_family == PF_INET6 || info->ai_family == PF_UNSPEC){
+            if(info->ai_family == PF_INET || info->ai_family == PF_INET6 || info->ai_family == PF_UNSPEC) {
                 addrInfos.push_back(info);
             }
             info = info->ai_next;
         }
         
-        if(addrInfos.empty()){
+        if(addrInfos.empty()) {
             freeaddrinfo(result);
             return false;
         }
@@ -113,13 +113,13 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
         int size = static_cast<int>(addrInfos.size());
         auto random = Util::random(0, size - 1);
         auto resInfo = addrInfos[random];
-        if(resInfo->ai_family == PF_INET6){
+        if(resInfo->ai_family == PF_INET6) {
             struct sockaddr_in6 sa{};
-            memcpy(&sa, resInfo -> ai_addr, resInfo -> ai_addrlen);
+            memcpy(&sa, resInfo->ai_addr, resInfo->ai_addrlen);
             ipInfo.emplace<struct sockaddr_in6>(sa);
         } else {
             struct sockaddr_in sa{};
-            memcpy(&sa, resInfo -> ai_addr, resInfo -> ai_addrlen);
+            memcpy(&sa, resInfo->ai_addr, resInfo->ai_addrlen);
             ipInfo.emplace<struct sockaddr_in>(sa);
         }
         freeaddrinfo(result);
@@ -131,20 +131,20 @@ bool parseHostAddr(const std::string& host, std::variant<SocketAddress, SocketAd
 }
 
 
-bool Network::parseHost(const std::string& host, IPAddressInfo& ipInfo){
+bool Network::parseHost(const std::string& host, IPAddressInfo& ipInfo) {
     std::variant<SocketAddress, SocketAddressv6> info;
     auto isSuccess = parseHostAddr(host, info);
-    if(!isSuccess){
+    if(!isSuccess) {
         return false;
     }
     
     auto p = std::get_if<SocketAddress>(&info);
-    if(p != nullptr){
+    if(p != nullptr) {
         ipInfo.ip = p->sin_addr;
         ipInfo.type = IPType::IPv4;
     } else {
         auto t = std::get_if<SocketAddressv6>(&info);
-        if(t == nullptr){
+        if(t == nullptr) {
             return false;
         }
         ipInfo.ip = t->sin6_addr;
@@ -160,14 +160,14 @@ std::string Network::getHostName() {
     return {host};
 }
 
-bool Network::getLocalAddress(IPAddressInfo& ip){
+bool Network::getLocalAddress(IPAddressInfo& ip) {
     struct ifaddrs *ifAddrStruct{};
     auto res = getifaddrs(&ifAddrStruct);
-    if(res != 0){
+    if(res != 0) {
         loge("get local ip error:%s", gai_strerror(res));
         return false;
     }
-    while (ifAddrStruct != nullptr) {
+    while(ifAddrStruct != nullptr) {
 #if NETWORK_LOG
         IPAddressInfo info;
         if (ifAddrStruct->ifa_addr->sa_family == AF_INET) {
@@ -181,11 +181,11 @@ bool Network::getLocalAddress(IPAddressInfo& ip){
         logi("get local network info:%s,type:%s %s", ifAddrStruct->ifa_name,
              info.type == IPType::IPv4 ? "ipv4:" : "ipv6", ip2str(info).c_str());
 #endif
-        if (strncmp(ifAddrStruct->ifa_name, "en0", 3) == 0) {
-            if (ifAddrStruct->ifa_addr->sa_family == AF_INET) {
+        if(strncmp(ifAddrStruct->ifa_name, "en0", 3) == 0) {
+            if(ifAddrStruct->ifa_addr->sa_family == AF_INET) {
                 ip.ip = ((struct sockaddr_in *) ifAddrStruct->ifa_addr)->sin_addr;
                 ip.type = IPType::IPv4;
-            } else if (ifAddrStruct->ifa_addr->sa_family == AF_INET6) {
+            } else if(ifAddrStruct->ifa_addr->sa_family == AF_INET6) {
                 ip.ip = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_addr;
                 ip.type = IPType::IPv6;
                 ip.scopeID = ((SocketAddressv6 *) ifAddrStruct->ifa_addr)->sin6_scope_id;

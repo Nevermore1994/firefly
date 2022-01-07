@@ -9,13 +9,13 @@
 #include <unordered_map>
 #include "Thread.hpp"
 
-namespace firefly{
+namespace firefly {
 
 constexpr const Time::TimeStamp kMaxThreadBlockTimeInterval = std::chrono::seconds(30).count(); //30s
 
-class ThreadManager:public NoCopyable{
+class ThreadManager : public NoCopyable {
 public:
-    static inline ThreadManager& shareInstance(){
+    static inline ThreadManager& shareInstance() {
         static ThreadManager instance;
         std::this_thread::get_id();
         return instance;
@@ -23,15 +23,20 @@ public:
 
 public:
     ThreadManager();
+    
     ~ThreadManager();
     
     void add(std::shared_ptr<Thread> thread);
+    
     void remove(const std::shared_ptr<Thread>& thread);
+    
     void remove(std::thread::id id);
     
     Thread& thisThread();
+
 private:
     void reportRunInfo() noexcept;
+
 private:
     std::unordered_map<std::thread::id, std::weak_ptr<Thread>> threadInfos_;
     std::mutex mutex_;

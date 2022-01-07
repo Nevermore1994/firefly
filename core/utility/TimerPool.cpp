@@ -12,7 +12,7 @@ using namespace firefly;
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-TimerPool::~TimerPool(){
+TimerPool::~TimerPool() {
     clear();
 }
 
@@ -48,19 +48,19 @@ void TimerPool::loop() noexcept {
         }
         timers.insert(timers_.begin(), timers_.end());
     }
-    for(auto& expireTimeInfo:expireTimes){
+    for(auto& expireTimeInfo: expireTimes) {
         auto id = expireTimeInfo.timerId;
         bool canRemove = timers.count(id) == 0;
         
-        if(canRemove){
+        if(canRemove) {
             continue;
         }
         auto& timer = timers[id];
-        if(timer.isValid){
+        if(timer.isValid) {
             timer.func();
         }
         canRemove = !timer.isValid || !timer.timerInfo.isLoop;
-        if(canRemove){
+        if(canRemove) {
             remove(id);
         } else {
             TimerInfo timerInfo = timer.timerInfo;
@@ -85,7 +85,7 @@ TimerId TimerPool::addTimer(uint64_t timeStamp, TimerCallback func, bool isLoop,
     return id;
 }
 
-TimerId TimerPool::runAt(uint64_t timeStamp, TimerCallback func) noexcept{
+TimerId TimerPool::runAt(uint64_t timeStamp, TimerCallback func) noexcept {
     return addTimer(timeStamp, std::move(func), false);
 }
 
@@ -114,7 +114,7 @@ TimerId TimerPool::runLoop(milliseconds timeInterval, TimerCallback func) noexce
 
 void TimerPool::cancel(TimerId id) {
     std::unique_lock<std::mutex> lock(mutex_);
-    if(timers_.count(id)){
+    if(timers_.count(id)) {
         timers_[id].isValid = false;
     }
 }
