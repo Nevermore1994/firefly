@@ -11,49 +11,35 @@ using namespace firefly;
 
 TimerInfo::TimerInfo(uint64_t time)
     : expireTime(time)
-    , timerId(Util::shortId()){
-
+    , timerId(Util::shortId()) {
+    
 }
 
-bool TimerInfo::operator<(const TimerInfo &rhs) const noexcept {
+bool TimerInfo::operator<(const TimerInfo& rhs) const noexcept {
     return expireTime < rhs.expireTime;
 }
 
-bool TimerInfo::operator>(const TimerInfo &rhs) const noexcept {
+bool TimerInfo::operator>(const TimerInfo& rhs) const noexcept {
     return expireTime > rhs.expireTime;
 }
 
 Timer::Timer()
     : timerInfo(0)
     , func(nullptr)
-    , isValid(false){
+    , isValid(false) {
     
 }
 
 Timer::Timer(uint64_t timeStamp, TimerCallback f)
     : timerInfo(timeStamp)
-    , func(std::move(f)){
+    , func(std::move(f)) {
     
-}
-
-Timer::Timer(const Timer& timer) noexcept
-    : timerInfo(timer.timerInfo)
-    , func(timer.func)
-    , isValid(timer.isValid){
-    
-}
-
-Timer& Timer::operator=(const Timer& timer) noexcept{
-    this->timerInfo = timer.timerInfo;
-    this->isValid = timer.isValid;
-    this->func = timer.func;
-    return *this;
 }
 
 Timer::Timer(Timer&& timer) noexcept
-        : timerInfo(timer.timerInfo)
-        , func(std::move(timer.func))
-        , isValid(timer.isValid){
+    : timerInfo(timer.timerInfo)
+    , func(std::move(timer.func))
+    , isValid(timer.isValid) {
     
 }
 

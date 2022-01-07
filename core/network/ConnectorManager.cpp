@@ -18,35 +18,35 @@ ConnectorManager::ConnectorManager() {
 }
 
 void ConnectorManager::reportEvent(Socket socket, ConnectorEvent event) noexcept {
-    if (connectors_.count(socket) == 0) {
+    if(connectors_.count(socket) == 0) {
         loge("error, socket is invalid. %d", socket);
         return;
     }
     auto connector = connectors_[socket];
-    if (ConnectorEvent::Add == event) {
+    if(ConnectorEvent::Add == event) {
         NetEngine::shareInstance().add(socket, connector->getInfo().connectorType);
-    } else if (ConnectorEvent::Remove == event) {
+    } else if(ConnectorEvent::Remove == event) {
         NetEngine::shareInstance().remove(socket);
     }
 }
 
 void ConnectorManager::send(Socket socket) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
-    if (connectors_.count(socket)) {
+    if(connectors_.count(socket)) {
         connectors_[socket]->onSend();
     }
 }
 
 void ConnectorManager::received(Socket socket) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
-    if (connectors_.count(socket)) {
+    if(connectors_.count(socket)) {
         connectors_[socket]->onReceived();
     }
 }
 
 void ConnectorManager::onError(Socket socket, ErrorInfo&& info) noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
-    if (connectors_.count(socket)) {
+    if(connectors_.count(socket)) {
         connectors_[socket]->onError(std::move(info));
     }
 }

@@ -10,13 +10,13 @@
 #include <cstdint>
 #include <functional>
 
-namespace firefly{
+namespace firefly {
 
 using TimerCallback = std::function<void()>;
 
 using TimerId = uint32_t;
 
-struct TimerInfo{
+struct TimerInfo {
     uint64_t expireTime;
     TimerId timerId;
     
@@ -24,23 +24,39 @@ struct TimerInfo{
     uint64_t loopInterval = 0; //ms
     
     bool operator<(const TimerInfo& rhs) const noexcept;
+    
     bool operator>(const TimerInfo& rhs) const noexcept;
     
-    TimerInfo(uint64_t time);
+    explicit TimerInfo(uint64_t time);
+    
     TimerInfo(const TimerInfo& info) = default;
+    
     TimerInfo& operator=(const TimerInfo& info) = default;
+    
     TimerInfo(TimerInfo&& info) = default;
+    
     TimerInfo& operator=(TimerInfo&& info) = default;
 };
 
+struct TimerInfoCompare {
+    bool operator()(const TimerInfo& lhs, const TimerInfo& rhs) const {
+        return lhs > rhs;
+    }
+};
 
-struct Timer{
+struct Timer {
     Timer();
+    
     Timer(uint64_t timeStamp, TimerCallback f);
-    Timer(const Timer& timer) noexcept;
-    Timer& operator=(const Timer& timer) noexcept;
+    
+    Timer(const Timer& timer) = default;
+    
+    Timer& operator=(const Timer& timer) = default;
+    
     Timer(Timer&& timer) noexcept;
+    
     Timer& operator=(Timer&& timer) noexcept;
+
 public:
     TimerInfo timerInfo;
     TimerCallback func;

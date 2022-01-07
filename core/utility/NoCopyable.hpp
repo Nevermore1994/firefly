@@ -5,15 +5,20 @@
 //
 #pragma once
 
-namespace firefly{
+namespace firefly {
 
-class NoCopyable{
+class NoCopyable {
 public:
     NoCopyable() = default;
-    ~NoCopyable() = default;
+    
+    virtual ~NoCopyable() = default;
+    
     NoCopyable(const NoCopyable&) = delete;
+    
     NoCopyable& operator=(const NoCopyable&) = delete;
+    
     NoCopyable(NoCopyable&&) = delete;
+    
     NoCopyable& operator=(NoCopyable&&) = delete;
 };
 

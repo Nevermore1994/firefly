@@ -9,48 +9,27 @@
 
 using namespace firefly::FileUtil;
 
-
-IFile::IFile(std::fstream::openmode openMode, const std::string& path)
-    : openMode_(openMode)
-    , path_(path)
-    , fstream_(path, openMode_)
-    , fileMode_(FileMode::None) {
+IFile::IFile(const std::string& path, FileMode mode)
+    : path_(path)
+    , mode_(mode) {
     
 }
 
-IFile::IFile(std::fstream::openmode openMode, std::string&& path)
-    : openMode_(openMode)
-    , path_(path)
-    , fstream_(path, openMode_)
-    , fileMode_(FileMode::None) {
-    
-}
-
-IFile::IFile(std::fstream::openmode openMode, const std::string& path, FileMode mode)
-    : openMode_(openMode | static_cast<std::fstream::openmode>(mode))
-    , path_(path)
-    , fstream_(path, openMode_)
-    , fileMode_(mode) {
-    
-}
-
-IFile::IFile(std::fstream::openmode openMode, std::string&& path, FileMode mode)
-    : openMode_(openMode | static_cast<std::fstream::openmode>(mode))
-    , path_(path)
-    , fstream_(path, openMode_)
-    , fileMode_(mode) {
+IFile::IFile(std::string&& path, FileMode mode)
+    : path_(path)
+    , mode_(mode) {
     
 }
 
 IFile::~IFile() {
-    if (fstream_.is_open()) {
-        fstream_.close();
+    if(file_) {
+        fclose(file_);
+        file_ = nullptr;
     }
 }
 
-
 WriteFile::WriteFile(const std::string& path)
-    : IFile(std::fstream::out, path)
+    : IFile(path, FileMode::WriteMode)
     , checkEveryN_(kCheckCount)
     , writeCount_(0)
     , writeSize_(0)
@@ -58,102 +37,115 @@ WriteFile::WriteFile(const std::string& path)
 }
 
 WriteFile::WriteFile(std::string&& path)
-    : IFile(std::fstream::out, path)
+    : IFile(path, FileMode::WriteMode)
     , checkEveryN_(kCheckCount)
     , writeCount_(0)
     , writeSize_(0)
     , checkCount_(0) {
 }
-
-WriteFile::WriteFile(const std::string& path, FileMode mode)
-    : IFile(std::fstream::out, path, mode)
-    , checkEveryN_(kCheckCount)
-    , writeCount_(0)
-    , writeSize_(0)
-    , checkCount_(0) {
-    
-}
-
-WriteFile::WriteFile(std::string&& path, FileMode mode)
-    : IFile(std::fstream::out, path, mode)
-    , checkEveryN_(kCheckCount)
-    , writeCount_(0)
-    , writeSize_(0)
-    , checkCount_(0) {
-    
-}
-
 
 WriteFile::~WriteFile() {
     flush();
 }
 
+bool WriteFile::open() {
+    if(path_.empty()) {
+        return false;
+    }
+    if(file_) {
+        return true;
+    }
+    file_ = fopen(path_.c_str(), ModeStr[(int) mode_]);
+    writeSize_ = 0;
+    writeCount_ = 0;
+    return file_ != nullptr;
+}
+
+void WriteFile::close() {
+    if(file_) {
+        fflush(file_);
+        fclose(file_);
+        file_ = nullptr;
+        writeSize_ = 0;
+        writeCount_ = 0;
+    }
+}
 
 void WriteFile::flush() {
-    if (fstream_) {
-        fstream_.flush();
+    if(file_) {
+        fflush(file_);
         writeCount_ = 0;
     }
 }
 
 void WriteFile::write(const std::string& str) {
-    write((str.c_str()), str.length());
+    write(reinterpret_cast<const uint8_t *>(str.c_str()), str.length());
 }
 
 void WriteFile::write(std::string&& str) {
-    write((str.c_str()), str.length());
+    write(reinterpret_cast<const uint8_t *>(str.c_str()), str.length());
 }
 
-void WriteFile::write(const char *data, uint32_t size) {
-    if (!fstream_.is_open()) {
+void WriteFile::write(const uint8_t *data, uint32_t size) {
+    if(!file_) {
         return;
     }
     writeCount_++;
-    fstream_.write(data, size);
+    size = fwrite(data, size, 1, file_);
     writeSize_ += size;
-    if (writeCount_ >= checkEveryN_) {
+    if(writeCount_ >= checkEveryN_) {
         flush();
     }
 }
 
 ReadFile::ReadFile(const std::string& path)
-    : IFile(std::fstream::in, path)
-    , readSize_(0) {
+    : IFile(path, FileMode::ReadMode)
+    , readSize_(0)
+    , readOver_(false) {
 }
 
 ReadFile::ReadFile(std::string&& path)
-    : IFile(std::fstream::in, path)
-    , readSize_(0) {
+    : IFile(path, FileMode::ReadMode)
+    , readSize_(0)
+    , readOver_(false) {
     
 }
 
-ReadFile::ReadFile(std::string&& path, FileMode mode)
-    : IFile(std::fstream::in, path, mode)
-    , readSize_(0) {
-    
-}
+ReadFile::~ReadFile() {
 
-ReadFile::ReadFile(const std::string& path, FileMode mode)
-    : IFile(std::fstream::in, path, mode)
-    , readSize_(0) {
-    
 }
 
 char ReadFile::readCh() {
-    if (!fstream_.is_open()) {
-        return EOF;
+    if(file_) {
+        int ch = getc(file_);
+        if(ch == EOF) {
+            readOver_ = true;
+        }
+        readSize_++;
+        return ch;
     }
-    int ch = fstream_.get();
-    readSize_++;
-    return (char) ch;
+    return EOF;
 }
 
-//will discard delim, you can append delim
-std::string ReadFile::readUntilChar(char delim) {
-    if (fstream_.is_open()) {
-        char buffer[kReadBuffSize] = {0};
-        fstream_.getline(buffer, kReadBuffSize, delim);
-        return {buffer};
+void ReadFile::backFillChar(char ch) {
+    if(file_) {
+        ungetc(ch, file_);
+    }
+}
+
+std::string ReadFile::readUntilChar(char ch) {
+    if(file_) {
+        std::string res;
+        int c = getc(file_);
+        while(ch != c && c != EOF) {
+            res.append(1, c);
+            readSize_++;
+            c = getc(file_);
+        }
+        if(c == EOF) {
+            readOver_ = true;
+        }
+        return res;
     }
     return "";
 }
@@ -166,42 +158,36 @@ std::string ReadFile::readWord() {
     return readUntilChar(' ');
 }
 
-void ReadFile::putback(char ch) {
-    if (fstream_.is_open()) {
-        fstream_.putback(ch);
+bool ReadFile::open() {
+    if(path_.empty()) {
+        return false;
     }
+    if(file_) {
+        return true;
+    }
+    file_ = fopen(path_.c_str(), ModeStr[(int) mode_]);
+    readSize_ = 0;
+    readOver_ = false;
+    return file_ != nullptr;
 }
 
-void ReadFile::unget() {
-    if (fstream_.is_open()) {
-        fstream_.unget();
+void ReadFile::close() {
+    if(file_) {
+        fclose(file_);
+        file_ = nullptr;
     }
 }
 
 File::File(const std::string& path)
-    : IFile(std::fstream::in | std::fstream::out, path)
+    : IFile(path, FileMode::FreeMode)
     , WriteFile(path)
     , ReadFile(path) {
 }
 
 File::File(std::string&& path)
-    : IFile(std::fstream::in | std::fstream::out, path)
+    : IFile(path, FileMode::FreeMode)
     , WriteFile(path)
     , ReadFile(path) {
-    
-}
-
-File::File(const std::string& path, FileMode mode)
-    : IFile(std::fstream::in | std::fstream::out, path, mode)
-    , WriteFile(path, mode)
-    , ReadFile(path, mode) {
-    
-}
-
-File::File(std::string&& path, FileMode mode)
-    : IFile(std::fstream::in | std::fstream::out, path, mode)
-    , WriteFile(path, mode)
-    , ReadFile(path, mode) {
     
 }
 
@@ -209,3 +195,21 @@ File::~File() {
     flush();
 }
 
+bool File::open() {
+    if(path_.empty()) {
+        return false;
+    }
+    if(file_) {
+        return true;
+    }
+    file_ = fopen(path_.c_str(), ModeStr[(int) mode_]);
+    return file_ != nullptr;
+}
+
+void File::close() {
+    if(file_) {
+        fflush(file_);
+        fclose(file_);
+        file_ = nullptr;
+    }
+}

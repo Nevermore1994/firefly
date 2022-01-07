@@ -12,7 +12,7 @@ using namespace firefly;
 using namespace std::chrono_literals;
 
 TimerManager::TimerManager()
-    : timerThread_(std::make_unique<Thread>("TimerManager", &TimerManager::loop, this)){
+    : timerThread_(std::make_unique<Thread>("TimerManager", &TimerManager::loop, this)) {
     timerThread_->start();
 }
 
@@ -23,7 +23,6 @@ TimerManager::~TimerManager() noexcept {
 
 void TimerManager::loop() {
     pool_.loop();
-    std::this_thread::sleep_for(1ms);
 }
 
 TimerId TimerManager::runAt(uint64_t timeStamp, TimerCallback func) {
@@ -35,6 +34,14 @@ TimerId TimerManager::runAfter(uint64_t delayTime, TimerCallback func) {
 }
 
 TimerId TimerManager::runLoop(uint64_t timeInterval, TimerCallback func) {
+    return pool_.runLoop(timeInterval, std::move(func));
+}
+
+TimerId TimerManager::runAfter(std::chrono::milliseconds delayTime, TimerCallback func) noexcept {
+    return pool_.runAfter(delayTime, std::move(func));
+}
+
+TimerId TimerManager::runLoop(std::chrono::milliseconds timeInterval, TimerCallback func) noexcept {
     return pool_.runLoop(timeInterval, std::move(func));
 }
 

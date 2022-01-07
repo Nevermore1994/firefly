@@ -9,9 +9,11 @@
 
 using namespace firefly;
 using namespace firefly::Util;
+using namespace firefly::Time;
+using namespace std::chrono_literals;
 
 ThreadManager::ThreadManager() {
-    timerId_ = TimerManager::shareInstance().runLoop(10 * 1000, [this]() {
+    timerId_ = TimerManager::shareInstance().runLoop(10s, [this]() {
         reportRunInfo();
     });
 }
@@ -42,9 +44,9 @@ void ThreadManager::remove(std::thread::id id) {
 Thread& ThreadManager::thisThread() {
     std::unique_lock<std::mutex> lock(mutex_);
     auto id = std::this_thread::get_id();
-    if(threadInfos_.count(id)){
+    if(threadInfos_.count(id)) {
         auto thread = threadInfos_[id];
-        if(thread.expired()){
+        if(thread.expired()) {
             throw std::runtime_error("this thread is expired.");
         }
         return *thread.lock();
@@ -56,22 +58,22 @@ Thread& ThreadManager::thisThread() {
 void ThreadManager::reportRunInfo() noexcept {
     std::unique_lock<std::mutex> lock(mutex_);
     TimeStamp now = nowTimeStamp();
-    logi("ThreadManager report now:%llu, thread:%lu", now, threadInfos_.size());
+    logi("ThreadManager report now:%llu, now live size :%lu", now, threadInfos_.size());
     //todo replace C++20 std::erase_if
     std::vector<std::thread::id> expiredThreads;
-    for(auto& pair:threadInfos_){
+    for(auto& pair: threadInfos_) {
         auto t = pair.second;
-        if(t.expired()){
+        if(t.expired()) {
             expiredThreads.push_back(pair.first);
             continue;
         }
         auto thread = t.lock();
         TimeStamp interval = (now - thread->getLastRunTimeStamp());
-        if (thread->isRunning() && interval >= kMaxThreadBlockTimeInterval) {
+        if(thread->isRunning() && interval >= kMaxThreadBlockTimeInterval) {
             loge("ThreadManager report [%s] is blocking.", thread->getName().data());
         }
     }
-    for (auto key: expiredThreads) {
+    for(auto key: expiredThreads) {
         threadInfos_.erase(key);
     }
 }

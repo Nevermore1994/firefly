@@ -4,11 +4,12 @@
 // Copyright (c) 2021 Nevermore All rights reserved.
 //
 #pragma once
+
 #include "Connector.hpp"
 #include <unordered_map>
 #include <mutex>
 
-namespace firefly::Network{
+namespace firefly::Network {
 
 class ConnectorManager : public IConnectorManager, std::enable_shared_from_this<ConnectorManager> {
 public:
@@ -23,9 +24,13 @@ public:
 
 public:
     ~ConnectorManager() override;
+    
     void reportEvent(Socket socket, ConnectorEvent event) noexcept override;
+    
     void send(Socket socket) noexcept override;
+    
     void received(Socket socket) noexcept override;
+    
     void onError(Socket socket, ErrorInfo&& info) noexcept override;
 
 private:

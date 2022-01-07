@@ -18,26 +18,21 @@ using namespace firefly;
 using namespace firefly::Util;
 using namespace std::literals;
 
-TimeStamp Util::nowTimeStamp(){
-    auto tp = std::chrono::time_point_cast<std::chrono::microseconds>(std::chrono::system_clock::now());
-    return tp.time_since_epoch().count();
-}
-
 std::string Util::randomString(uint32_t length) {
     static std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"s;
     std::string result;
     result.resize(length);
-
+    
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 61);// 61 = 26 * 2 + 10 - 1. [0, 61]
-    for (int i = 0; i < length; i++)
+    for(int i = 0; i < length; i++)
         result[i] = charset[dis(gen)];
     return result;
 }
 
 uint64_t Util::randomId(uint8_t length) {
-    if(length >= 18){
+    if(length >= 18) {
         throw std::runtime_error("randomId error");
     }
     static std::string charset = "1234567890"s;
@@ -47,7 +42,7 @@ uint64_t Util::randomId(uint8_t length) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 9);
-    for (int i = 0; i < length; i++)
+    for(int i = 0; i < length; i++)
         result[i] = charset[dis(gen)];
     return std::stoull(result);
 }
@@ -60,13 +55,15 @@ std::string Util::uuid() {
     return Util::randomString(64);
 }
 
-std::vector<std::string>& Util::spiltString(const std::string& str, char flag, std::vector<std::string>& res, bool isSkipSpace) {
+std::vector<std::string>&
+Util::spiltString(const std::string& str, char flag, std::vector<std::string>& res, bool isSkipSpace) {
     std::istringstream iss(str);
-    for (std::string item; std::getline(iss, item, flag);){
-        if (isSkipSpace && item.empty())
+    for(std::string item; std::getline(iss, item, flag);) {
+        if(isSkipSpace && item.empty()) {
             continue;
-        else
+        } else {
             res.push_back(item);
+        }
     }
     return res;
 }
