@@ -7,28 +7,28 @@
 #include "File.hpp"
 #include <cstdio>
 
-using namespace firefly;
+using namespace firefly::FileUtil;
 
-FileUtil::IFile::IFile(const std::string& path, FileMode mode)
+IFile::IFile(const std::string& path, FileMode mode)
     : path_(path)
     , mode_(mode) {
     
 }
 
-FileUtil::IFile::IFile(std::string&& path, FileMode mode)
+IFile::IFile(std::string&& path, FileMode mode)
     : path_(path)
     , mode_(mode) {
     
 }
 
-FileUtil::IFile::~IFile() {
+IFile::~IFile() {
     if(file_) {
         fclose(file_);
         file_ = nullptr;
     }
 }
 
-FileUtil::WriteFile::WriteFile(const std::string& path)
+WriteFile::WriteFile(const std::string& path)
     : IFile(path, FileMode::WriteMode)
     , checkEveryN_(kCheckCount)
     , writeCount_(0)
@@ -36,7 +36,7 @@ FileUtil::WriteFile::WriteFile(const std::string& path)
     , checkCount_(0) {
 }
 
-FileUtil::WriteFile::WriteFile(std::string&& path)
+WriteFile::WriteFile(std::string&& path)
     : IFile(path, FileMode::WriteMode)
     , checkEveryN_(kCheckCount)
     , writeCount_(0)
@@ -44,11 +44,11 @@ FileUtil::WriteFile::WriteFile(std::string&& path)
     , checkCount_(0) {
 }
 
-FileUtil::WriteFile::~WriteFile() {
+WriteFile::~WriteFile() {
     flush();
 }
 
-bool FileUtil::WriteFile::open() {
+bool WriteFile::open() {
     if(path_.empty()) {
         return false;
     }
@@ -61,7 +61,7 @@ bool FileUtil::WriteFile::open() {
     return file_ != nullptr;
 }
 
-void FileUtil::WriteFile::close() {
+void WriteFile::close() {
     if(file_) {
         fflush(file_);
         fclose(file_);
@@ -71,22 +71,22 @@ void FileUtil::WriteFile::close() {
     }
 }
 
-void FileUtil::WriteFile::flush() {
+void WriteFile::flush() {
     if(file_) {
         fflush(file_);
         writeCount_ = 0;
     }
 }
 
-void FileUtil::WriteFile::write(const std::string& str) {
+void WriteFile::write(const std::string& str) {
     write(reinterpret_cast<const uint8_t *>(str.c_str()), str.length());
 }
 
-void FileUtil::WriteFile::write(std::string&& str) {
+void WriteFile::write(std::string&& str) {
     write(reinterpret_cast<const uint8_t *>(str.c_str()), str.length());
 }
 
-void FileUtil::WriteFile::write(const uint8_t *data, uint32_t size) {
+void WriteFile::write(const uint8_t *data, uint32_t size) {
     if(!file_) {
         return;
     }
@@ -98,24 +98,24 @@ void FileUtil::WriteFile::write(const uint8_t *data, uint32_t size) {
     }
 }
 
-FileUtil::ReadFile::ReadFile(const std::string& path)
+ReadFile::ReadFile(const std::string& path)
     : IFile(path, FileMode::ReadMode)
     , readSize_(0)
     , readOver_(false) {
 }
 
-FileUtil::ReadFile::ReadFile(std::string&& path)
+ReadFile::ReadFile(std::string&& path)
     : IFile(path, FileMode::ReadMode)
     , readSize_(0)
     , readOver_(false) {
     
 }
 
-FileUtil::ReadFile::~ReadFile() {
+ReadFile::~ReadFile() {
 
 }
 
-char FileUtil::ReadFile::readCh() {
+char ReadFile::readCh() {
     if(file_) {
         int ch = getc(file_);
         if(ch == EOF) {
@@ -127,13 +127,13 @@ char FileUtil::ReadFile::readCh() {
     return EOF;
 }
 
-void FileUtil::ReadFile::backFillChar(char ch) {
+void ReadFile::backFillChar(char ch) {
     if(file_) {
         ungetc(ch, file_);
     }
 }
 
-std::string FileUtil::ReadFile::readUntilChar(char ch) {
+std::string ReadFile::readUntilChar(char ch) {
     if(file_) {
         std::string res;
         int c = getc(file_);
@@ -150,15 +150,15 @@ std::string FileUtil::ReadFile::readUntilChar(char ch) {
     return "";
 }
 
-std::string FileUtil::ReadFile::readLine() {
+std::string ReadFile::readLine() {
     return readUntilChar('\n');
 }
 
-std::string FileUtil::ReadFile::readWord() {
+std::string ReadFile::readWord() {
     return readUntilChar(' ');
 }
 
-bool FileUtil::ReadFile::open() {
+bool ReadFile::open() {
     if(path_.empty()) {
         return false;
     }
@@ -171,31 +171,31 @@ bool FileUtil::ReadFile::open() {
     return file_ != nullptr;
 }
 
-void FileUtil::ReadFile::close() {
+void ReadFile::close() {
     if(file_) {
         fclose(file_);
         file_ = nullptr;
     }
 }
 
-FileUtil::File::File(const std::string& path)
+File::File(const std::string& path)
     : IFile(path, FileMode::FreeMode)
     , WriteFile(path)
     , ReadFile(path) {
 }
 
-FileUtil::File::File(std::string&& path)
+File::File(std::string&& path)
     : IFile(path, FileMode::FreeMode)
     , WriteFile(path)
     , ReadFile(path) {
     
 }
 
-FileUtil::File::~File() {
+File::~File() {
     flush();
 }
 
-bool FileUtil::File::open() {
+bool File::open() {
     if(path_.empty()) {
         return false;
     }
@@ -206,7 +206,7 @@ bool FileUtil::File::open() {
     return file_ != nullptr;
 }
 
-void FileUtil::File::close() {
+void File::close() {
     if(file_) {
         fflush(file_);
         fclose(file_);
