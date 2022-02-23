@@ -56,12 +56,17 @@ Thread& ThreadManager::thisThread() {
 }
 
 void ThreadManager::reportRunInfo() noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
     TimeStamp now = nowTimeStamp();
     logi("ThreadManager report now:%llu, now live size :%lu", now, threadInfos_.size());
     //todo replace C++20 std::erase_if
     std::vector<std::thread::id> expiredThreads;
-    for(auto& pair: threadInfos_) {
+    decltype(threadInfos_) threadInfos;
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        std::copy(threadInfos.begin(), threadInfos.end(), threadInfos_);
+    }
+
+    for(auto& pair: threadInfos) {
         auto t = pair.second;
         if(t.expired()) {
             expiredThreads.push_back(pair.first);
@@ -73,7 +78,11 @@ void ThreadManager::reportRunInfo() noexcept {
             loge("ThreadManager report [%s] is blocking.", thread->getName().data());
         }
     }
-    for(auto key: expiredThreads) {
-        threadInfos_.erase(key);
+    if(!expiredThreads.empty()){
+        std::unique_lock<std::mutex> lock(mutex_);
+        for(auto key: expiredThreads) {
+            threadInfos_.erase(key);
+        }
     }
+
 }

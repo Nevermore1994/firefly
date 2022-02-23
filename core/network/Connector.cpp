@@ -399,9 +399,6 @@ bool Connector::receiveUdpData() noexcept {
     return receiveSize == 0;
 }
 
-bool Connector::isIgnoredError() noexcept {
+inline bool Connector::isIgnoredError() noexcept {
     return errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN || errno == ENOBUFS;
 }
-
-
-

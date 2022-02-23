@@ -24,7 +24,7 @@ public:
         
     }
     
-    ~MemoryPool() {
+    ~MemoryPool() override {
         release();
     }
     

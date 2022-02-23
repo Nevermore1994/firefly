@@ -51,7 +51,7 @@ std::string uuid();
 
 //string
 std::vector<std::string>&
-spiltString(const std::string& str, char flag, std::vector<std::string>& res, bool isSkipSpace = true);
+spiltString(const std::string& str, const char& flag, std::vector<std::string>& res, bool isSkipSpace = true);
 
 }// end namespace firefly::Util
 
