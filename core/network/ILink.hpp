@@ -29,7 +29,7 @@ class ILink {
 public:
     virtual ~ILink() noexcept = default;
     
-    virtual LinkType linkType() const noexcept = 0;
+    virtual LinkType linkType() const noexcept  = 0;
     
     virtual bool open() noexcept = 0;
     

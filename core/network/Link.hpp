@@ -18,7 +18,7 @@ public:
     
     ~Link() override = default;
     
-    inline LinkType linkType() const noexcept override {
+    inline LinkType linkType() const noexcept override{
         return linkInfo_.linkType;
     }
     

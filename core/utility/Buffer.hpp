@@ -18,7 +18,7 @@ class Buffer : public NoCopyable {
 public:
     Buffer();
     
-    ~Buffer() = default;
+    ~Buffer() override = default;
 
 public:
     void append(const T *data, uint32_t size) noexcept;
@@ -29,21 +29,25 @@ public:
 
 public:
     [[maybe_unused]]
+    [[nodiscard]]
     inline uint32_t readPosition() const noexcept {
         return readPosition_;
     }
     
     [[maybe_unused]]
+    [[nodiscard]]
     inline uint32_t writePosition() const noexcept {
         return writePosition_;
     }
     
     [[maybe_unused]]
+    [[nodiscard]]
     inline uint32_t length() const noexcept {
         return writePosition_ - readPosition_;
     }
     
     [[maybe_unused]]
+    [[nodiscard]]
     inline T *front() noexcept {
         std::unique_lock<std::mutex> lock(mutex_);
         return data_->data() + readPosition_;

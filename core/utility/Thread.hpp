@@ -47,7 +47,7 @@ public:
     
     explicit Thread(const std::string& name);
     
-    ~Thread() noexcept;
+    ~Thread()  noexcept override;
     
     void start() noexcept;
     
