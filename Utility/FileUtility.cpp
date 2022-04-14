@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <cstring>
+#include <filesystem>
 
 using namespace firefly;
 
@@ -21,32 +22,7 @@ bool FileUtil::isFileExist(const std::string& path) {
 }
 
 bool FileUtil::createDir(const std::string& path) {
-    if(path.empty()) {
-        return false;
-    }
-    
-    std::string createPath = path;
-    if(*(path.rbegin()) != '/') {
-        createPath += "/";
-    }
-    
-    std::string subPath;
-    for(uint32_t i = 1; i < createPath.size(); ++i) {
-        if(createPath[i] != '/') {
-            continue;
-        }
-        
-        subPath = createPath.substr(0, i);
-        if(access(subPath.c_str(), F_OK) == 0) {
-            continue;
-        }
-        
-        if(mkdir(subPath.c_str(), 0755) == -1) {
-            return false;
-        }
-    }
-    
-    return true;
+    return std::filesystem::create_directory(path);
 }
 
 bool FileUtil::deleteFile(const std::string& path) {
@@ -102,6 +78,11 @@ bool FileUtil::removeDir(const std::string& path, bool isRetain) {
             remove(path.c_str());
         }
     }
-    
     return res;
+}
+
+bool FileUtil::copy(const std::string &from, const std::string &to){
+    std::error_code error;
+    std::filesystem::copy(from, to, std::filesystem::copy_options::recursive, error);
+    return error.value() == 0;
 }

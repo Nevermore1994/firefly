@@ -48,7 +48,7 @@ uint64_t Util::randomId(uint8_t length) {
 }
 
 uint32_t Util::shortId() {
-    return Util::randomId(12);
+    return static_cast<uint32_t>(Util::randomId(12));
 }
 
 std::string Util::uuid() {
@@ -56,7 +56,7 @@ std::string Util::uuid() {
 }
 
 std::vector<std::string>&
-Util::spiltString(const std::string& str, char flag, std::vector<std::string>& res, bool isSkipSpace) {
+Util::spiltString(const std::string& str, const char& flag, std::vector<std::string>& res, bool isSkipSpace) {
     std::istringstream iss(str);
     for(std::string item; std::getline(iss, item, flag);) {
         if(isSkipSpace && item.empty()) {

@@ -12,6 +12,7 @@ using namespace firefly::Util;
 using namespace firefly::Time;
 using namespace std::chrono_literals;
 
+
 ThreadManager::ThreadManager() {
     timerId_ = TimerManager::shareInstance().runLoop(10s, [this]() {
         reportRunInfo();
@@ -25,6 +26,7 @@ ThreadManager::~ThreadManager() {
     }
     TimerManager::shareInstance().cancel(timerId_);
 }
+
 
 void ThreadManager::add(std::shared_ptr<Thread> thread) {
     std::unique_lock<std::mutex> lock(mutex_);
@@ -55,13 +57,21 @@ Thread& ThreadManager::thisThread() {
     }
 }
 
+
 void ThreadManager::reportRunInfo() noexcept {
-    std::unique_lock<std::mutex> lock(mutex_);
     TimeStamp now = nowTimeStamp();
     logi("ThreadManager report now:%llu, now live size :%lu", now, threadInfos_.size());
     //todo replace C++20 std::erase_if
     std::vector<std::thread::id> expiredThreads;
-    for(auto& pair: threadInfos_) {
+    std::vector<std::pair<std::thread::id, std::weak_ptr<Thread>>> threadInfos;
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        for(const auto& pair:threadInfos_){
+            threadInfos.emplace_back(pair.first, pair.second);
+        }
+    }
+
+    for(auto& pair:threadInfos) {
         auto t = pair.second;
         if(t.expired()) {
             expiredThreads.push_back(pair.first);
@@ -73,7 +83,10 @@ void ThreadManager::reportRunInfo() noexcept {
             loge("ThreadManager report [%s] is blocking.", thread->getName().data());
         }
     }
-    for(auto key: expiredThreads) {
-        threadInfos_.erase(key);
+    if(!expiredThreads.empty()){
+        std::unique_lock<std::mutex> lock(mutex_);
+        for(auto key: expiredThreads) {
+            threadInfos_.erase(key);
+        }
     }
 }
