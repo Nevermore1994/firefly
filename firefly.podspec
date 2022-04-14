@@ -18,9 +18,9 @@ Pod::Spec.new do |s|
 
       s.source       = { :git => "https://github.com/Nevermore1994/firefly.git", :tag => "#{s.version}" }
 
-      #s.source_files  = 'Framework/**/*.{h,m}'
+      s.source_files  = "framework/**/*.{h, hpp, cpp, cc}"
 
-      s.public_header_files = "framework/iOS/firefly.framework/headers/*.h"
+      s.public_header_files = "framework/iOS/firefly.framework/**/*.{h, hpp}"
 
       s.requires_arc = false
 
