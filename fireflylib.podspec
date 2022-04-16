@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
       s.name         = "fireflylib"
 
-      s.version      = "0.0.1.a"
+      s.version      = "0.0.2"
 
       s.summary      = "C++ base Framework"
 
