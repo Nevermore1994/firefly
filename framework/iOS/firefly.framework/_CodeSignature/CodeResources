@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/File.hpp</key>
 		<data>
-		iPx7CC/QRA8nb1F5rvaN281IDh8=
+		oxSOqwNxs0DVVethvvHg2u9EgFE=
 		</data>
 		<key>Headers/FileUtility.hpp</key>
 		<data>
@@ -18,7 +18,7 @@
 		</data>
 		<key>Headers/RingBuffer.hpp</key>
 		<data>
-		vme98N3l1v99oTPTCjP0QOgtD8A=
+		yt+oNYKRrZgMnh0iRWeKePfAqag=
 		</data>
 		<key>Headers/Thread.hpp</key>
 		<data>
@@ -36,10 +36,6 @@
 		<data>
 		8M+Iyec7NFr08qN5K/DUkmzrbWA=
 		</data>
-		<key>Headers/TimerManager.h</key>
-		<data>
-		02c07J3D8QwiKeUSbhA0dOWFD/U=
-		</data>
 		<key>Headers/TimerPool.hpp</key>
 		<data>
 		KURXuQKsCmBP33BV7yirqxUOviE=
@@ -54,7 +50,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		5I4LMVfdoFRmtgFuPwp5imTHUTw=
+		x5kE1fLpvgFzcjWdlifdEFw+ss0=
 		</data>
 		<key>PrivateHeaders/Log.hpp</key>
 		<data>
@@ -67,11 +63,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			iPx7CC/QRA8nb1F5rvaN281IDh8=
+			oxSOqwNxs0DVVethvvHg2u9EgFE=
 			</data>
 			<key>hash2</key>
 			<data>
-			Y3MOQIpxuq60PAyEamTTuAaoQL7Q0G+f+OxIdZdV9bA=
+			2epqWPx5JFTZ28pUF6uVrGjO0ITW/75kD5Dkqsq1how=
 			</data>
 		</dict>
 		<key>Headers/FileUtility.hpp</key>
@@ -100,11 +96,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			vme98N3l1v99oTPTCjP0QOgtD8A=
+			yt+oNYKRrZgMnh0iRWeKePfAqag=
 			</data>
 			<key>hash2</key>
 			<data>
-			7Yr+95aS6EaZkZwC9BMa+prHoCESBhTbRMJm6Ld0nKA=
+			FGUIpITS962fTYp7uqemQVBeEEjg++jUPmsk4/HAZyc=
 			</data>
 		</dict>
 		<key>Headers/Thread.hpp</key>
@@ -149,17 +145,6 @@
 			<key>hash2</key>
 			<data>
 			cMKLWubs48WgsdUGMQmtONx7C151W1GhJfT6t3HKRn4=
-			</data>
-		</dict>
-		<key>Headers/TimerManager.h</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			02c07J3D8QwiKeUSbhA0dOWFD/U=
-			</data>
-			<key>hash2</key>
-			<data>
-			4gnAOBOHrBLH1oeTD6oeh3QyIP4CkGs52VYInXbYdbI=
 			</data>
 		</dict>
 		<key>Headers/TimerPool.hpp</key>

@@ -9,13 +9,13 @@
 
 using namespace firefly::FileUtil;
 
-File::File(const std::string& path, FileMode mode)
+File::File(const std::string& path, std::ios_base::openmode mode)
     : path_(path)
     , mode_(mode) {
     
 }
 
-File::File(std::string&& path, FileMode mode)
+File::File(std::string&& path, std::ios_base::openmode mode)
     : path_(path)
     , mode_(mode) {
     

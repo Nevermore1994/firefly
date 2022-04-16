@@ -5,7 +5,7 @@
 //
 #include "ThreadManager.hpp"
 #include "Log.hpp"
-#include "TimerManager.h"
+#include "TimerManager.hpp"
 
 using namespace firefly;
 using namespace firefly::Util;

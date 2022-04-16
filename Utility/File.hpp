@@ -22,9 +22,9 @@ enum class FileMode{
 
 class File : public NoCopyable{
 public:
-    explicit File(const std::string& path, FileMode mode);
+    explicit File(const std::string& path, std::ios_base::openmode mode);
     
-    explicit File(std::string&& path, FileMode mode);
+    explicit File(std::string&& path, std::ios_base::openmode mode);
     
     ~File() override;
 
@@ -40,11 +40,15 @@ public:
     inline const std::fstream& stream() const{
         return *file_;
     }
+    
+    inline std::ios_base::openmode FileMode() const{
+        return mode_;
+    }
 
 protected:
     std::string path_;
     std::unique_ptr<std::fstream> file_;
-    FileMode mode_;
+    std::ios_base::openmode mode_;
 };
 
 }//end namespace firefly::FileUtil

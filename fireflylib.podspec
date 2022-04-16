@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-      s.name         = "firefly"
+      s.name         = "fireflylib"
 
       s.version      = "0.0.1"
 
@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
       s.ios.deployment_target = '14.0'
 
       s.description  = <<-DESC
-        C++ base Framework
+        C++ base Framework, include Thread, Time, Ringbuffer
       DESC
       s.homepage     = "https://github.com/Nevermore1994/firefly.git"
      
@@ -25,5 +25,6 @@ Pod::Spec.new do |s|
       s.requires_arc = false
 
       s.ios.vendored_frameworks = 'framework/iOS/firefly.framework'
-    
+      
+      s.pod_target_xcconfig = { 'ONLY_ACTIVE_ARCH' => 'YES' }
     end
