@@ -11,15 +11,6 @@
 
 namespace firefly::FileUtil {
 
-enum class FileMode{
-    append = std::ios_base::app,
-    end    = std::ios_base::ate,
-    binary = std::ios_base::binary,
-    in     = std::ios_base::in,
-    out    = std::ios_base::out,
-    trunc  = std::ios_base::trunc,
-};
-
 class File : public NoCopyable{
 public:
     explicit File(const std::string& path, std::ios_base::openmode mode);
@@ -37,7 +28,7 @@ public:
         return std::string_view(path_);
     }
     
-    inline const std::fstream& stream() const{
+    inline std::fstream& stream(){
         return *file_;
     }
     
