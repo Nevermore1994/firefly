@@ -10,7 +10,7 @@
 #include <mutex>
 #include <array>
 #include <atomic>
-#include <cstring>
+#include <algorithm>
 
 namespace firefly {
 
@@ -62,12 +62,12 @@ void RingBuffer<T, Size>::append(const T *data, uint64_t size) noexcept {
     auto pos = writePosition_ + size;
     if(pos > size_){
         auto t = size_ - writePosition_;
-        memcpy(data_->data() + writePosition_, data, t);
+        std::copy(data, data + t, data_->data() + writePosition_);
         writePosition_ = 0;
-        memcpy(data_->data() + writePosition_, data + t, size - t);
+        std::copy(data + t, data + size, data_->data() + writePosition_);
         writePosition_ = size - t;
     } else {
-        memcpy(data_->data() + writePosition_, data, size);
+        std::copy(data, data + size, data_->data() + writePosition_);
         writePosition_ = pos;
     }
 }
@@ -82,7 +82,7 @@ void RingBuffer<T, Size>::reset() noexcept {
 
 template<typename T, uint64_t Size>
 uint64_t RingBuffer<T, Size>::read(T *data, uint64_t size) noexcept {
-    uint32_t dataLength = length();
+    auto dataLength = length();
     uint32_t readSize = 0;
     if(dataLength == 0) {
         return readSize;
@@ -94,13 +94,13 @@ uint64_t RingBuffer<T, Size>::read(T *data, uint64_t size) noexcept {
     
     auto pos = readPosition_ + readSize;
     if(pos < size_){
-        memcpy(data, data_->data() + readPosition_, readSize);
+        std::copy(data_->data() + readPosition_, data_->data() + readPosition_ + readSize, data);
         readPosition_ += readSize;
     } else {
         auto temp = size_ - readPosition_;
-        memcpy(data, data_->data() + readPosition_, temp);
+        std::copy(data_->data() + readPosition_, data_->data() + readPosition_ + temp, data);
         readPosition_ = 0;
-        memcpy(data + temp, data_->data() + readPosition_, readSize - temp);
+        std::copy(data_->data() + readPosition_, data_->data() + readPosition_ + readSize - temp, data + temp);
         readPosition_ =  readSize - temp;
     }
     return readSize;
