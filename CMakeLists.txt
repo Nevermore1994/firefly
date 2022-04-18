@@ -27,9 +27,12 @@ file(GLOB ALL_SOURCE
 
 include_directories(${INCLUDE_DIR})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
 add_executable(${PROJECT_NAME} main.cpp ${ALL_SOURCE})
+
+#add_library(${PROJECT_NAME} ${ALL_SOURCE})
 
 find_package(Threads REQUIRED)
 
