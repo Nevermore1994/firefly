@@ -10,6 +10,7 @@
 #include <mutex>
 #include <array>
 #include <atomic>
+#include <cstring>
 
 namespace firefly {
 
@@ -35,11 +36,11 @@ public:
 
 private:
     inline uint64_t length() const noexcept {
-        uint64_t length = writePosition_ - readPosition_;
+        int64_t length = writePosition_ - readPosition_;
         if(length < 0){
             length += size_;
         }
-        return writePosition_ - readPosition_;
+        return length;
     }
 
 private:
@@ -92,7 +93,7 @@ uint64_t RingBuffer<T, Size>::read(T *data, uint64_t size) noexcept {
     }
     
     auto pos = readPosition_ + readSize;
-    if(readSize < size_){
+    if(pos < size_){
         memcpy(data, data_->data() + readPosition_, readSize);
         readPosition_ += readSize;
     } else {
