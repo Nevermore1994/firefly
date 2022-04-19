@@ -18,13 +18,13 @@ Pod::Spec.new do |s|
 
       s.source       = { :git => "https://github.com/Nevermore1994/firefly.git", :tag => "#{s.version}" }
 
-      s.source_files  = "framework/**/*.{h, hpp, cpp, cc}"
+      s.source_files  = "framework/iOS/firefly.xcframework/**/*.{h, hpp}"
 
-      s.public_header_files = "framework/iOS/firefly.framework/**/*.{h, hpp}"
+      s.public_header_files = "framework/iOS/firefly.xcframework/**/*.{h, hpp}"
 
       s.requires_arc = false
 
-      s.ios.vendored_frameworks = 'framework/iOS/firefly.framework'
+      s.ios.vendored_frameworks = 'framework/iOS/firefly.xcframework'
       
       s.pod_target_xcconfig = { 'ONLY_ACTIVE_ARCH' => 'YES' }
       
