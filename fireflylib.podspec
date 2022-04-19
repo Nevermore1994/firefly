@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
       s.name         = "fireflylib"
 
-      s.version      = "0.0.3"
+      s.version      = "0.0.4"
 
       s.summary      = "C++ base Framework"
 
@@ -29,5 +29,6 @@ Pod::Spec.new do |s|
       s.pod_target_xcconfig = { 'ONLY_ACTIVE_ARCH' => 'YES' }
       
       s.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+
       s.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
     end
