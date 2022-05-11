@@ -1,0 +1,17 @@
+/usr/local/lib/libfirefly.a
+/usr/local/include/firefly/File.hpp
+/usr/local/include/firefly/FileUtility.hpp
+/usr/local/include/firefly/Log.hpp
+/usr/local/include/firefly/NoCopyable.hpp
+/usr/local/include/firefly/RingBuffer.hpp
+/usr/local/include/firefly/Thread.hpp
+/usr/local/include/firefly/ThreadManager.hpp
+/usr/local/include/firefly/Time.hpp
+/usr/local/include/firefly/Timer.hpp
+/usr/local/include/firefly/TimerManager.hpp
+/usr/local/include/firefly/TimerPool.hpp
+/usr/local/include/firefly/Utility.hpp
+/usr/local/lib/cmake/firefly/fireflyTargets.cmake
+/usr/local/lib/cmake/firefly/fireflyTargets-debug.cmake
+/usr/local/lib/cmake/firefly/fireflyConfig.cmake
+/usr/local/lib/cmake/firefly/fireflyConfigVersion.cmake
