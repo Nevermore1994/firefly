@@ -21,7 +21,7 @@ namespace firefly {
 class Thread : public NoCopyable {
 
 public:
-    template<class Func, typename ... Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Func>, std::thread>>>
+    template<class Func, typename ... Args>
     Thread(std::string&& name, Func&& f, Args&& ... args)
         :name_(std::move(name))
         , isRunning_(false)
@@ -32,7 +32,7 @@ public:
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
     }
     
-    template<class Func, typename ... Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Func>, std::thread>>>
+    template<class Func, typename ... Args>
     Thread(const std::string& name, Func&& f, Args&& ... args)
         :name_(name)
         , isRunning_(false)
@@ -62,7 +62,7 @@ public:
     TimerId runAfter(uint64_t delayTime, TimerCallback func) noexcept; //ms
     TimerId runAfter(std::chrono::milliseconds delayTime, TimerCallback func) noexcept;
     
-    template<class Func, typename ... Args, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Func>, std::thread>>>
+    template<class Func, typename ... Args>
     void setFunc(Func&& f, Args&& ... args) noexcept {
         std::unique_lock<std::mutex> lock(mutex_);
         func_ = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);

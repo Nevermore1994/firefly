@@ -48,9 +48,19 @@ private:
 };
 
 template<typename T>
-void registerClass(const std::string& name);
+void registerClass(const std::string& name) {
+    return Reflection::shareInstance().enrolment(name, []() {
+        return new T();
+    });
+}
 
-void* generate(const std::string& name);
+inline void* generate(const std::string& name) {
+    auto f = Reflection::shareInstance().generate(name);
+    if(f) {
+        return f();
+    }
+    return nullptr;
+}
 
 #define RegisterClass(name) \
     registerClass<name>(#name)

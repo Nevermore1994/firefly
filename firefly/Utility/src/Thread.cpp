@@ -10,6 +10,7 @@
 
 #include "Thread.hpp"
 #include "Log.hpp"
+#include <cassert>
 
 using namespace firefly;
 using namespace std::chrono;
@@ -37,6 +38,8 @@ Thread::~Thread() noexcept {
 }
 
 void Thread::stop() noexcept {
+    //don't this thread join self
+    assert(std::this_thread::get_id() != worker_.get_id());
     if(isExit_) {
         return;
     }

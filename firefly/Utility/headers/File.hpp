@@ -8,6 +8,7 @@
 #include <fstream>
 #include <memory>
 #include "NoCopyable.hpp"
+#include "FileUtility.hpp"
 
 namespace firefly::FileUtil {
 
@@ -35,7 +36,11 @@ public:
     inline std::ios_base::openmode FileMode() const{
         return mode_;
     }
-
+    
+    inline int64_t fileSize() const noexcept{
+        return FileUtil::getFileSize(path_);
+    }
+    
 protected:
     std::string path_;
     std::unique_ptr<std::fstream> file_;

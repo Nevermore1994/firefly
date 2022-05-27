@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
 
+#set (CMAKE_C_COMPILER "/usr/local/Cellar/gcc/11.1.0_1/bin/gcc-11")
+#set (CMAKE_CXX_COMPILER "/usr/local/Cellar/gcc/11.1.0_1/bin/g++-11")
+
 set(PACKAGE_VERSION 0.0.1)
 
 project(Installation VERSION ${PACKAGE_VERSION})
@@ -17,7 +20,6 @@ set(INCLUDE_DIR
         ./firefly/third_party
         )
 
-aux_source_directory(./firefly/test/ TEST_DIR_SRCS)
 aux_source_directory(./firefly/Utility/src UTILITY_DIR_SRCS)
 aux_source_directory(./firefly/third_party THIRD_PARTY_DIR_SRCS)
 
