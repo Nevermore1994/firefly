@@ -14,11 +14,11 @@
 #include <string_view>
 #include "TimerPool.hpp"
 #include "Utility.hpp"
-#include "NoCopyable.hpp"
+#include "NonCopyable.hpp"
 
 namespace firefly {
 
-class Thread : public NoCopyable {
+class Thread : public NonCopyable {
 
 public:
     template<class Func, typename ... Args>

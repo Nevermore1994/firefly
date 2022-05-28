@@ -5,7 +5,7 @@
 //
 #pragma once
 
-#include "NoCopyable.hpp"
+#include "NonCopyable.hpp"
 #include <cstdint>
 #include <mutex>
 #include <array>
@@ -17,7 +17,7 @@ namespace firefly {
 constexpr uint64_t RingBufferLength = 1024 * 1024 * 500;
 
 template<typename T, uint64_t Size = RingBufferLength>
-class RingBuffer : public NoCopyable {
+class RingBuffer : public NonCopyable {
 public:
     RingBuffer();
     

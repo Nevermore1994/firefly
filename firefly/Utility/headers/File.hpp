@@ -7,12 +7,12 @@
 
 #include <fstream>
 #include <memory>
-#include "NoCopyable.hpp"
+#include "NonCopyable.hpp"
 #include "FileUtility.hpp"
 
 namespace firefly::FileUtil {
 
-class File : public NoCopyable{
+class File : public NonCopyable{
 public:
     explicit File(const std::string& path, std::ios_base::openmode mode);
     

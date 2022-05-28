@@ -12,7 +12,7 @@
 		<data>
 		sTfDWMv66d2zYhrp2ZO1Oh7mSKE=
 		</data>
-		<key>Headers/NoCopyable.hpp</key>
+		<key>Headers/NonCopyable.hpp</key>
 		<data>
 		4bmbxbwQbUCBCEFGs2HL+/PIrBo=
 		</data>
@@ -81,7 +81,7 @@
 			QnGtZNcdxz0sN2UlcFDBPk66P37N8uB+2QZnhnF+J+s=
 			</data>
 		</dict>
-		<key>Headers/NoCopyable.hpp</key>
+		<key>Headers/NonCopyable.hpp</key>
 		<dict>
 			<key>hash</key>
 			<data>

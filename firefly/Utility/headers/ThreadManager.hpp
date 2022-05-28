@@ -13,7 +13,7 @@ namespace firefly {
 
 constexpr const Time::TimeStamp kMaxThreadBlockTimeInterval = std::chrono::seconds(30).count(); //30s
 
-class ThreadManager : public NoCopyable {
+class ThreadManager : public NonCopyable {
 public:
     static inline ThreadManager& shareInstance() {
         static ThreadManager instance;

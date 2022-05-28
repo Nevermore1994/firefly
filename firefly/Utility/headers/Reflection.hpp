@@ -10,7 +10,7 @@
 #include <functional>
 #include <any>
 #include <mutex>
-#include "NoCopyable.hpp"
+#include "NonCopyable.hpp"
 
 namespace firefly{
 

@@ -2,7 +2,7 @@
 /usr/local/include/firefly/File.hpp
 /usr/local/include/firefly/FileUtility.hpp
 /usr/local/include/firefly/Log.hpp
-/usr/local/include/firefly/NoCopyable.hpp
+/usr/local/include/firefly/NonCopyable.hpp
 /usr/local/include/firefly/Reflection.hpp
 /usr/local/include/firefly/RingBuffer.hpp
 /usr/local/include/firefly/Thread.hpp

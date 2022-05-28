@@ -10,11 +10,11 @@
 #include "Thread.hpp"
 #include "Timer.hpp"
 #include "TimerPool.hpp"
-#include "NoCopyable.hpp"
+#include "NonCopyable.hpp"
 
 namespace firefly {
 
-class TimerManager : public NoCopyable {
+class TimerManager : public NonCopyable {
 public:
     inline static TimerManager& shareInstance() {
         static TimerManager instance;
