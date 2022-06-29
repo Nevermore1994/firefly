@@ -41,6 +41,9 @@ public:
         return FileUtil::getFileSize(path_);
     }
     
+    inline bool isOpen() const noexcept{
+        return file_ != nullptr && file_->is_open();
+    }
 protected:
     std::string path_;
     std::unique_ptr<std::fstream> file_;
